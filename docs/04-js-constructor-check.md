@@ -114,3 +114,105 @@ JavaScript 选择**约定俗成**而非强制：
 | 文档注释 | 用 JSDoc 标注函数用途 |
 
 > **设计哲学**：JavaScript 信任开发者，通过约定而不是强制来区分。
+
+---
+
+## 6. new 的工作原理
+
+`new` 在行为上确实**像一个函数调用**：
+
+### 6.1 new 做了什么
+
+```javascript
+function Vehicle(price) {
+    this.price = price;
+}
+var v = new Vehicle(1000);
+```
+
+`new Vehicle(1000)` 实际上做了 3 件事：
+
+| 步骤 | 操作 | 相当于 |
+|------|------|--------|
+| 1 | 创建新对象 | `{}` |
+| 2 | 绑定 this | `this = 新对象` |
+| 3 | 执行构造函数 | `Vehicle.call(this, 1000)` |
+| 4 | 返回 this | 自动返回 |
+
+### 6.2 手动实现 new
+
+```javascript
+function myNew(constructor, ...args) {
+    // 1. 创建空对象
+    var obj = {};
+    
+    // 2. 设置原型
+    obj.__proto__ = constructor.prototype;
+    
+    // 3. 执行构造函数，绑定 this
+    var result = constructor.apply(obj, args);
+    
+    // 4. 返回对象（如果构造函数返回对象则返回它）
+    return result || obj;
+}
+
+// 用法
+var v = myNew(Vehicle, 1000);
+```
+
+### 6.3 结论
+
+> `new` = **创建对象 + 绑定this + 执行函数 + 返回对象**
+> 
+> 本质上就是一个**特殊的函数调用语法糖**
+
+这揭示了 JavaScript 的**原型继承**机制。
+
+---
+
+## 7. 构造函数的显式 return
+
+### 规则
+
+| 返回值类型 | 结果 |
+|------------|------|
+| 原始类型 (number, string, boolean) | **忽略**，返回 `this` |
+| 对象 (Object, Array, Function) | **返回该对象**，忽略 `this` |
+
+### 示例
+
+```javascript
+function Foo() {
+    this.name = 'Foo';
+    return 'hello';  // 原始类型，被忽略
+}
+var f = new Foo();
+console.log(f.name);  // 'Foo' — 返回的是 this
+
+
+function Bar() {
+    this.name = 'Bar';
+    return { type: 'custom' };  // 返回对象
+}
+var b = new Bar();
+console.log(b.type);  // 'custom'
+console.log(b.name);  // undefined — this 被丢弃
+```
+
+### 应用：单例模式
+
+```javascript
+var instance = null;
+
+function Single() {
+    if (instance) {
+        return instance;  // 返回已有实例
+    }
+    instance = this;
+    this.data = 'only one';
+}
+
+var s1 = new Single();
+var s2 = new Single();
+console.log(s1 === s2);  // true — 同一个实例
+```
