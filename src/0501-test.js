@@ -30,5 +30,21 @@ Vehicle.prototype.ride = function() {
 var aVehicle = new Vehicle();
 console.log(aVehicle.price);
 
+var people = {"id": 1, "name": "jack"}
+
+var man = Object.create(people);
+
+console.log(`people is ${JSON.stringify(people)}`);
+console.log(`man is ${JSON.stringify(man)}`);
+people.sayHi();
+man.sayHi();
+
+man.id = 100;
+man.name = 'lucy';
+
+console.log(`people is ${JSON.stringify(people)}`);
+console.log(`man is ${JSON.stringify(man)}`);
+people.sayHi();
+man.sayHi();
 
 
