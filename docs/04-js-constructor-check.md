@@ -216,3 +216,41 @@ var s1 = new Single();
 var s2 = new Single();
 console.log(s1 === s2);  // true — 同一个实例
 ```
+
+---
+
+## 8. Object 本身就是 Function
+
+### 关键结论
+
+```javascript
+Object instanceof Function  // true
+```
+
+### 解释
+
+| 关系 | 说明 |
+|------|------|
+| `Object` 是**构造函数** | 用来创建对象 |
+| `Object` 本身是 **Function 的实例** | `Object instanceof Function` = true |
+| `Function` 本身也是 **Function 的实例** | `Function instanceof Function` = true |
+
+```javascript
+console.log(Object instanceof Function);   // true
+console.log(Function instanceof Function); // true
+console.log(Array instanceof Function);    // true
+console.log(Date instanceof Function);     // true
+```
+
+### 原型链
+
+```
+Object
+  │
+  └── __proto__ → Function.prototype
+                       │
+                       └── __proto__ → Object.prototype → null
+```
+
+**结论**：所有的**构造函数**（Array, Date, Object, Function...）都是 `Function` 的实例。`Object` 既是一个对象，也是一个构造函数。
+```
