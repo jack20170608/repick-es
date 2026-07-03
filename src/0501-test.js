@@ -16,5 +16,19 @@ function Fubar(foo, bar){
 var result = Fubar(1,2);
 console.log(result._foo);
 
+var Vehicle = function (){
+    this.price = 1000;
+    return {
+        price : 2999
+    }
+}
+
+Vehicle.prototype.ride = function() {
+    console.log('Riding is a good thing!!')
+}
+
+var aVehicle = new Vehicle();
+console.log(aVehicle.price);
+
 
 
