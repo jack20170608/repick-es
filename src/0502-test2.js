@@ -44,3 +44,11 @@ var Dog = function(name, tail){
 
 Dog.prototype = Object.create(Animal.prototype);
 Dog.prototype.constructor = Dog;
+
+Dog.prototype.waggingTail = function(){
+    console.log(`Wagging ${this.tail} tail.`);
+}
+
+var aDog = new Dog("lighting", "fat");
+prettyPrint(aDog , "This is a dog");
+aDog.waggingTail();
