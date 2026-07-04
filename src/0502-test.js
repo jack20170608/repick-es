@@ -44,12 +44,17 @@ var a100 = new A(100);
 a100.sayHi();
 a100.print();
 
-Object.setPrototypeOf(B, Function.prototype);
+// Object.setPrototypeOf(B, Function.prototype);
 console.log(`${Object.getPrototypeOf(B) === Function.prototype}`);
 console.log(`After setPrototypeOf, the typeof B is ${typeof B}`);
 console.log(
   `After setPrototypeOf, instance of Function of B is ${B instanceof Function}`,
 );
-
+// the following code still not work
 // var b100 = new B(100);
 // b100.sayHi();
+
+console.log("--==================================================");
+
+function doSomething(){}
+console.log( JSON.stringify(doSomething.prototype, null, 2));
