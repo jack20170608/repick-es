@@ -52,3 +52,12 @@ Dog.prototype.waggingTail = function(){
 var aDog = new Dog("lighting", "fat");
 prettyPrint(aDog , "This is a dog");
 aDog.waggingTail();
+
+
+//--=====================================
+printSpliter("Test03 test the __proto__ and prototype in ES5.");
+
+var o1 = {};
+var f1 = function(){};
+
+console.log("stop here");
