@@ -1,28 +1,28 @@
 let obj = {
-    p: ["Hello", { y: "World" }],
+  p: ["Hello", { y: "World" }],
 };
 
 let {
-    p,
-    p: [x, { y }],
+  p,
+  p: [x, { y }],
 } = obj;
 
 console.log(`${p}, x=${x}, y=${y}.`);
 
 let obj2 = {
-    name: "jack",
-    hi: function () {
-        console.log("hi");
-    },
+  name: "jack",
+  hi: function () {
+    console.log("hi");
+  },
 };
 
 const node = {
-    loc: {
-        start: {
-            line: 1,
-            column: 5
-        }
+  loc: {
+    start: {
+      line: 1,
+      column: 5
     }
+  }
 };
 
 let { loc, loc: { start }, loc: { start: { line } } } = node;
@@ -66,10 +66,10 @@ function tag(s, v1, v2) {
   return "OK";
 }
 
-tag`Hello ${ a + b } world ${ a * b}`;
+tag`Hello ${a + b} world ${a * b}`;
 
 let total = 30;
-let msg = passthru`The total is ${total} (${total*1.05} with tax)`;
+let msg = passthru`The total is ${total} (${total * 1.05} with tax)`;
 
 function passthru(literals) {
   let result = '';
@@ -85,4 +85,29 @@ function passthru(literals) {
   return result;
 }
 
-console
+
+function insert(value) {
+  return {
+    into: function (array) {
+      return {
+        after: function (afterValue) {
+          array.splice(array.indexOf(afterValue) + 1, 0, value);
+          return array;
+        }
+      };
+    }
+  };
+}
+
+console.log(`result is ${insert(2).into([1,3]).after(3)}`);
+
+const pipeline = (...funcs) =>
+  val => funcs.reduce((a, b) => b(a), val);
+
+
+const plus1 = a => a + 1;
+const mult2 = a => a * 2;
+const addThenMult = pipeline(plus1, mult2);
+
+console.log(`result is ${addThenMult(3)}`);
+
