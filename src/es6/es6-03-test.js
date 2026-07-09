@@ -99,7 +99,7 @@ function insert(value) {
   };
 }
 
-console.log(`result is ${insert(2).into([1,3]).after(3)}`);
+console.log(`result is ${insert(2).into([1, 3]).after(3)}`);
 
 const pipeline = (...funcs) =>
   val => funcs.reduce((a, b) => b(a), val);
@@ -111,3 +111,31 @@ const addThenMult = pipeline(plus1, mult2);
 
 console.log(`result is ${addThenMult(3)}`);
 
+function tco(f) {
+  var value;
+  var active = false;
+  var accumulated = [];
+
+  return function accumulator() {
+    accumulated.push(arguments);
+    if (!active) {
+      active = true;
+      while (accumulated.length) {
+        value = f.apply(this, accumulated.shift());
+      }
+      active = false;
+      return value;
+    }
+  };
+}
+
+var sum = tco(function (x, y) {
+  if (y > 0) {
+    return sum(x + 1, y - 1)
+  }
+  else {
+    return x
+  }
+});
+
+sum(1, 100000)
