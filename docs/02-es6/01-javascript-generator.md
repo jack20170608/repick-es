@@ -192,7 +192,7 @@ gen.next();                    // { value: undefined, done: true }
 
 ### 5. return() 方法
 
-立即终止生成器。
+立即终止生成器，并可以设置返回值。
 
 ```javascript
 function* gen() {
@@ -202,10 +202,79 @@ function* gen() {
 }
 
 const g = gen();
+
 g.next();           // { value: 1, done: false }
 g.return('终止');   // { value: '终止', done: true }
 g.next();           // { value: undefined, done: true }  ← 永远结束
 ```
+
+#### return() 的实际用途
+
+**用途一：提前终止，避免无限生成器泄漏**
+
+```javascript
+function* fibonacci() {
+  let [a, b] = [0, 1];
+  while (true) {
+    yield a;
+    [a, b] = [b, a + b];
+  }
+}
+
+const fib = fibonacci();
+// 只要前5个
+for (let i = 0; i < 5; i++) {
+  console.log(fib.next().value);
+}
+fib.return('已完成'); // 显式终止，避免无限生成器泄漏
+```
+
+**用途二：触发 finally 清理资源**
+
+```javascript
+function* longRunningTask() {
+  try {
+    yield 1;
+    yield 2;
+    yield 3;
+  } finally {
+    // return() 会触发 finally 块
+    console.log('清理资源...');
+  }
+}
+
+const task = longRunningTask();
+task.next();           // { value: 1, done: false }
+task.return('取消');   // 打印 '清理资源...'，返回 { value: '取消', done: true }
+```
+
+**用途三：实现可取消的迭代**
+
+```javascript
+function* processItems(items) {
+  for (const item of items) {
+    // 当 return 被调用时，可以在这里检查 done 状态
+    const result = yield item * 2;
+    if (result === 'STOP') {
+      return 'canceled';
+    }
+  }
+  return 'completed';
+}
+
+const process = processItems([1, 2, 3, 4, 5]);
+process.next();           // 处理 1
+process.next();           // 处理 2
+process.return('STOP');   // 提前终止，返回 { value: 'STOP', done: true }
+```
+
+#### 三者对比
+
+| 方法 | 作用 |
+|------|------|
+| `yield value` | 暂停并产出值，可恢复 |
+| `throw(error)` | 注入错误，可捕获后继续 |
+| `return(value)` | 永久终止，返回指定值 |
 
 ---
 
