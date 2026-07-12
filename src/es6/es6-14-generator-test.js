@@ -71,4 +71,38 @@ function take(n, generator) {
     return result;
 }
 
-console.log(take(100, fibonacci()));
+console.log(take(20, fibonacci()));
+
+
+class TreeNode {
+  constructor(val, children = []) {
+    this.val = val;
+    this.children = children;
+  }
+}
+
+function* preOrderTraversal(node) {
+  if (!node) return;
+  yield node.val;
+  for (const child of node.children) {
+    yield* preOrderTraversal(child);  // yield* 委托给子生成器
+  }
+}
+
+// 构建一个简单的树
+const tree = new TreeNode('root', [
+  new TreeNode('a', [
+    new TreeNode('a1'),
+    new TreeNode('a2')
+  ]),
+  new TreeNode('b', [
+    new TreeNode('b1'),
+    new TreeNode('b2')
+  ]),
+  new TreeNode('c')
+]);
+
+// 遍历结果: root → a → a1 → a2 → b → b1 → b2 → c
+for (const val of preOrderTraversal(tree)) {
+  console.log(val);
+}
