@@ -64,7 +64,8 @@ curl -X PUT "http://localhost:12580/mockserver/expectation" \
     },
     "httpResponse": {
       "statusCode": 200,
-      "body": "{'name': 'mock'}",
+      "body": "[{\"name\": \"jack\"},{\"name\": \"jerry\"},{\"name\": \"leo\"}]",
+      "headers": {"Content-Type": ["application/json"]},
       "delay": {
         "timeUnit": "MILLISECONDS",
         "value": 500
