@@ -1,73 +1,66 @@
-// 回调地狱示例：多层嵌套的异步操作
+// Promise 版本：多层异步操作
 // 场景：获取用户 → 获取订单 → 获取订单详情
 
-// 模拟异步函数
-function fetchUser(userId, callback) {
-  setTimeout(() => {
-    if (userId === 1) {
-      callback(null, { id: 1, name: '张三' });
-    } else {
-      callback(new Error('用户不存在'));
-    }
-  }, 100);
-}
-
-function fetchOrders(userId, callback) {
-  setTimeout(() => {
-    if (userId === 1) {
-      callback(null, [
-        { id: 101, userId: 1, total: 100 },
-        { id: 102, userId: 1, total: 200 }
-      ]);
-    } else {
-      callback(new Error('订单不存在'));
-    }
-  }, 100);
-}
-
-function fetchOrderDetail(orderId, callback) {
-  setTimeout(() => {
-    if (orderId === 101) {
-      callback(null, {
-        id: 101,
-        items: [
-          { product: 'iPhone', price: 100 },
-          { product: '壳', price: 20 }
-        ]
-      });
-    } else {
-      callback(new Error('订单详情不存在'));
-    }
-  }, 100);
-}
-
-// 回调地狱：层层嵌套，难维护
-fetchUser(1, function(err, user) {
-  if (err) {
-    console.error('获取用户失败:', err);
-    return;
-  }
-
-  console.log('获取到用户:', user.name);
-
-  fetchOrders(user.id, function(err, orders) {
-    if (err) {
-      console.error('获取订单失败:', err);
-      return;
-    }
-
-    console.log('获取到订单:', orders.length, '个');
-
-    fetchOrderDetail(orders[0].id, function(err, detail) {
-      if (err) {
-        console.error('获取订单详情失败:', err);
-        return;
+// 模拟异步函数（返回 Promise）
+function fetchUser(userId) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (userId === 1) {
+        resolve({ id: 1, name: '张三' });
+      } else {
+        reject(new Error('用户不存在'));
       }
-
-      console.log('订单详情:', detail);
-      console.log('商品列表:', detail.items);
-
-      // 只有在这里才能做最终处理...
-    });
+    }, 100);
   });
-});
+}
+
+function fetchOrders(userId) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (userId === 1) {
+        resolve([
+          { id: 101, userId: 1, total: 100 },
+          { id: 102, userId: 1, total: 200 }
+        ]);
+      } else {
+        reject(new Error('订单不存在'));
+      }
+    }, 100);
+  });
+}
+
+function fetchOrderDetail(orderId) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (orderId === 101) {
+        resolve({
+          id: 101,
+          items: [
+            { product: 'iPhone', price: 100 },
+            { product: '壳', price: 20 }
+          ]
+        });
+      } else {
+        reject(new Error('订单详情不存在'));
+      }
+    }, 100);
+  });
+}
+
+// Promise 链式调用：扁平化
+fetchUser(1)
+  .then(user => {
+    console.log('获取到用户:', user.name);
+    return fetchOrders(user.id);
+  })
+  .then(orders => {
+    console.log('获取到订单:', orders.length, '个');
+    return fetchOrderDetail(orders[0].id);
+  })
+  .then(detail => {
+    console.log('订单详情:', detail);
+    console.log('商品列表:', detail.items);
+  })
+  .catch(err => {
+    console.error('出错啦:', err.message);
+  });
