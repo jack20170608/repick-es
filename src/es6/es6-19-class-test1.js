@@ -13,3 +13,7 @@ class Point {
         return this.#c;
     }
 }
+
+const p1 = new Point(1, 2);
+
+console.log(`${p1.counter}`);
