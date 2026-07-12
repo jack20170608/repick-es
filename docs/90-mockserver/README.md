@@ -15,6 +15,7 @@ docker run -d -p 12580:1080 mockserver/mockserver
 ### Docker Desktop 管理
 
 在 Docker Desktop 界面中可以：
+
 - 查看容器状态
 - 查看日志：点击容器 → Logs
 - 停止/重启：点击容器 → Stop / Start
@@ -48,6 +49,26 @@ curl -X PUT "http://localhost:12580/mockserver/expectation" \
       "statusCode": 200,
       "body": "{\"token\": \"abc123\"}",
       "headers": {"Content-Type": ["application/json"]}
+    }
+  }'
+```
+
+```bash
+# 创建 GET 并设置延迟
+curl -X PUT "http://localhost:12580/mockserver/expectation" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/users"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{'name': 'mock'}",
+      "delay": {
+        "timeUnit": "MILLISECONDS",
+        "value": 500
+      }
     }
   }'
 ```
@@ -105,8 +126,8 @@ curl -X PUT "http://localhost:12580/mockserver/expectation" \
 
 ## Port
 
-| 服务 | 端口 |
-|------|------|
+| 服务                | 端口  |
+| ------------------- | ----- |
 | MockServer HTTP API | 12580 |
 
 ## 详细文档
