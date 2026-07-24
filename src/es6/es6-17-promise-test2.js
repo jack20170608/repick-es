@@ -1,14 +1,23 @@
-const p1 = new Promise(function (resolve, reject) {
-    setTimeout(() => reject(new Error('fail in p1')), 2000)
-})
+const p1 = new Promise((resolve, reject) => {
+    console.log(`${new Date().toISOString()}, running....`);
 
-const p2 = new Promise(function (resolve, reject) {
-    setTimeout(() => resolve(p1), 1000)
-})
+    setTimeout(() => {
+        console.log(`${new Date().toISOString()}, Before resolve ....`);
+        resolve("hahahaha");
+        console.log(`${new Date().toISOString()}, After resolve ....`);
+    }, 1000);
+    console.log(`${new Date().toISOString()}, after timeout ....`);
+});
 
-p1
-    .catch(error => console.log(error));
+p1.then((value) => {
+    console.log(`${new Date().toISOString()}, In the 1st then, value=${value}.`);
+});
 
-// p2
-    // .then(result => console.log(result))
-    // .catch(error => console.log(error))
+p1.then((value) => {
+    console.log(`${new Date().toISOString()}, In the 2nd then, value=${value}.`);
+});
+
+
+console.log(`${new Date().toISOString()}, Finished ....`);
+
+
