@@ -27,3 +27,6 @@ const v2 = new RangeIterator(0,10,2);
 for(v of v2){
   console.log(v);
 }
+
+//实际是返回一个新的函数
+const add = a => b => a + b;
