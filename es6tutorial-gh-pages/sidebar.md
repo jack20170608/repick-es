@@ -6,7 +6,7 @@
 
 ## 目录
 1. [前言](#README)
-1. [ECMAScript 6简介](#docs/02-intro)
+1. [ECMAScript 6简介](docs/02-intro.md)
 1. [let 和 const 命令](#docs/03-let)
 1. [变量的解构赋值](#docs/04-destructuring)
 1. [字符串的扩展](#docs/05-string)
