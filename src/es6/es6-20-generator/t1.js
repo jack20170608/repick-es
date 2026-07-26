@@ -1,12 +1,20 @@
-function* gen2() {
-  console.log("gen start");
-  console.log(yield 'a', yield 100);  // 第二次 next() 调用时才会打印
-  console.log('gen end');
+const g = function* () {
+  while (true) {
+    try {
+      yield;
+    } catch (e) {
+      if (e != 'a') throw e;
+      console.log('内部捕获', e);
+    }
+  }
+};
+
+const i = g();
+i.next();
+
+try {
+  throw new Error('a');
+  throw new Error('b');
+} catch (e) {
+  console.log('外部捕获', e);
 }
-
-console.log("111");
-
-const g21 = gen2();
-g21.next();
-g21.next();
-g21.next();
