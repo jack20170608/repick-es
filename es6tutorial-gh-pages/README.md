@@ -14,17 +14,6 @@
 
 全书已由电子工业出版社出版，2017年9月推出了第三版，书名为《ES6 标准入门》。纸版内容截止到出版时，网站内容一直在修订。
 
-- [淘宝](https://s.taobao.com/search?q=ES6%E6%A0%87%E5%87%86%E5%85%A5%E9%97%A8+%E7%AC%AC3%E7%89%88)
-- [京东](https://search.jd.com/Search?keyword=ES6%E6%A0%87%E5%87%86%E5%85%A5%E9%97%A8%20%E7%AC%AC3%E7%89%88&enc=utf-8&wq=ES6%E6%A0%87%E5%87%86%E5%85%A5%E9%97%A8%20%E7%AC%AC3%E7%89%88)
-- [当当](https://product.dangdang.com/25156888.html)
-
-### 版权许可
-
-本书采用“保持署名—非商用”创意共享4.0许可证。
-
-只要保持原作者署名和非商用，您可以自由地阅读、分享、修改本书。
-
-详细的法律条文请参见[创意共享](http://creativecommons.org/licenses/by-nc/4.0/)网站。
 
 ## 目录
 
@@ -73,3 +62,10 @@
 - [修订历史](https://github.com/ruanyf/es6tutorial/commits/gh-pages)
 - [反馈意见](https://github.com/ruanyf/es6tutorial/issues)
 
+### 版权许可
+
+本书采用“保持署名—非商用”创意共享4.0许可证。
+
+只要保持原作者署名和非商用，您可以自由地阅读、分享、修改本书。
+
+详细的法律条文请参见[创意共享](http://creativecommons.org/licenses/by-nc/4.0/)网站。
