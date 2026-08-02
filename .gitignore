@@ -84,6 +84,7 @@ eship-ui/frontend.tar.gz
 # Claude
 .claude/
 .remember/
+node_modules/
 
 # JIRA
 .atlassian/
