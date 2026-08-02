@@ -38,4 +38,4 @@ function thunkify(fn) {
       }
     }
   }
-};
+}
