@@ -85,6 +85,7 @@ eship-ui/frontend.tar.gz
 .claude/
 .remember/
 node_modules/
+package-lock.json
 
 # JIRA
 .atlassian/
