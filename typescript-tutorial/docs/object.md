@@ -199,13 +199,13 @@ obj.y.toLowerCase() // 报错
 所以，读取可选属性之前，必须检查一下是否为`undefined`。
 
 ```typescript
-const user:{
-  firstName: string;
-  lastName?: string;
-} = { firstName: 'Foo'};
+const user: {
+    firstName: string;
+    lastName?: string;
+} = {firstName: 'Foo'};
 
-if (user.lastName !== undefined) {
-  console.log(`hello ${user.firstName} ${user.lastName}`)
+if (user2.lastName !== undefined) {
+    console.log(`hello ${user2.firstName} ${user2.lastName}`)
 }
 ```
 
@@ -213,14 +213,14 @@ if (user.lastName !== undefined) {
 
 ```typescript
 // 写法一
-let firstName = (user.firstName === undefined)
-  ? 'Foo' : user.firstName;
-let lastName = (user.lastName === undefined)
-  ? 'Bar' : user.lastName;
+let firstName = (user2.firstName === undefined)
+    ? 'Foo' : user2.firstName;
+let lastName = (user2.lastName === undefined)
+    ? 'Bar' : user2.lastName;
 
 // 写法二
-let firstName = user.firstName ?? 'Foo';
-let lastName = user.lastName ?? 'Bar';
+let firstName = user2.firstName ?? 'Foo';
+let lastName = user2.lastName ?? 'Bar';
 ```
 
 上面示例中，写法一使用三元运算符`?:`，判断是否为`undefined`，并设置默认值。写法二使用 Null 判断运算符`??`，与写法一的作用完全相同。

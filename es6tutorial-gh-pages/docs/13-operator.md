@@ -281,10 +281,10 @@ x ?? (x = y)
 
 ```javascript
 // 老的写法
-user.id = user.id || 1;
+user2.id = user2.id || 1;
 
 // 新的写法
-user.id ||= 1;
+user2.id ||= 1;
 ```
 
 上面示例中，`user.id`属性如果不存在，则设为`1`，新的写法比老的写法更紧凑一些。

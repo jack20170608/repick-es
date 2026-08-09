@@ -413,12 +413,21 @@ upload(new Blob(['hello world'], {type: 'text/plain'}));
 
 ```javascript
 void open(
-   string method,
-   string url,
-   optional boolean async,
-   optional string user,
-   optional string password
-);
+    string
+method,
+    string
+url,
+    optional
+boolean
+async,
+    optional
+string
+user2,
+    optional
+string
+password
+)
+;
 ```
 
 - `method`：表示 HTTP 动词方法，比如`GET`、`POST`、`PUT`、`DELETE`、`HEAD`等。

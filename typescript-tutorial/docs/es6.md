@@ -129,22 +129,22 @@ interface IterableIterator<T> extends Iterator<T> {
 
 ```typescript
 function* createNumbers(): IterableIterator<number> {
-  let n = 0;
-  while (1) {
-    yield n++;
-  }
+    let n = 0;
+    while (1) {
+        yield n++;
+    }
 }
 
 let numbers = createNumbers()
 
 // {value: 0, done: false}
-numbers.next()
+numbers2.next()
 
 // {value: 1, done: false}
-numbers.next()
+numbers2.next()
 
 // {value: 2, done: false}
-numbers.next()
+numbers2.next()
 ```
 
 上面示例中，`createNumbers()`返回的对象`numbers`即具有`next()`方法，也具有`[Symbol.iterator]`属性，所以满足`IterableIterator<T>`接口。

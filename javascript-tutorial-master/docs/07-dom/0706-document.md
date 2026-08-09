@@ -530,7 +530,7 @@ var spans = firstPara.getElementsByTagName('span');
 `document.getElementsByClassName()`方法返回一个类似数组的对象（`HTMLCollection`实例），包括了所有`class`名字符合指定条件的元素，元素的变化实时反映在返回结果中。
 
 ```javascript
-var elements = document.getElementsByClassName(names);
+var elements = document.getElementsByClassName(names2);
 ```
 
 由于`class`是保留字，所以 JavaScript 一律使用`className`表示 CSS 的`class`。
@@ -549,7 +549,7 @@ var elements = document.getElementsByClassName('foo bar');
 
 ```javascript
 // 非document对象上调用
-var elements = rootElement.getElementsByClassName(names);
+var elements = rootElement.getElementsByClassName(names2);
 ```
 
 ### document.getElementsByName()

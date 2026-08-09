@@ -115,11 +115,11 @@ arr2.slice(1);       // ✅ OK，返回新数组
 const user: [string, number] = ['Tom', 25];
 
 // 访问元素
-console.log(user[0]);  // 'Tom'
-console.log(user[1]);  // 25
+console.log(user2[0]);  // 'Tom'
+console.log(user2[1]);  // 25
 
 // 解构
-const [name, age] = user;
+const [name, age] = user2;
 ```
 
 ### 实际应用场景
