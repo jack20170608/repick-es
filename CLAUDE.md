@@ -14,6 +14,7 @@
   - `docs/01-es5/` - JavaScript ES5 相关文档
   - `docs/02-es6/` - JavaScript ES6 相关文档
   - `docs/03-node/` - Node.js 相关文档
+  - `docs/03-typescript/` - TypeScript 相关文档
   - `docs/04-react/` - React 相关文档
 
 ### 文档编号规则
@@ -35,3 +36,13 @@
 1. 先查看现有分类目录序号
 2. 使用下一个序号创建新目录（如已有 01, 02，则新建 03）
 3. 目录内文档从 01 开始编号
+
+## 源代码目录规则
+
+源代码文件存放于 `src/` 目录，遵循同样的序号规则：
+
+- `src/01-es5/` - ECMAScript 5 相关学习源码
+- `src/02-es6/` - ECMAScript 6 相关学习源码
+- `src/03-typescript/` - TypeScript 相关学习源码
+
+序号规则与文档规则一致，每个子目录内独立编号。
