@@ -21,7 +21,7 @@ tsc --version
 ### 方式一：直接编译单个文件
 
 ```bash
-tsc src/03-typescript/test-01-helloworld.ts
+tsc src/03-typescript/test-02-more.ts
 ```
 
 这会生成同名的 `.js` 文件。
