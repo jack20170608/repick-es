@@ -82,3 +82,40 @@ const product: Product = {
 
 console.log('\n=== 接口 ===');
 console.log('产品:', product);
+
+// 字面量类型
+type Direction = 'up' | 'down' | 'left' | 'right';
+const dir: Direction = 'up';
+
+function setLevel(level: 1 | 2 | 3): void {
+  console.log(`Level set to: ${level}`);
+}
+
+console.log('\n=== 字面量类型 ===');
+console.log('方向:', dir);
+setLevel(1);
+// setLevel(5);  // 错误：类型 '"5"' 不能赋值给类型 '1 | 2 | 3'
+
+// as const 创建一个完全只读的对象
+const config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000
+} as const;
+
+console.log('\n=== as const ===');
+console.log('API URL:', config.apiUrl);
+console.log('Timeout:', config.timeout);
+// config.apiUrl = 'other';  // 错误：无法分配到 'apiUrl'，因为它是只读属性
+
+// 枚举
+enum DirectionEnum {
+  Up,
+  Down,
+  Left,
+  Right
+}
+
+const dirEnum: DirectionEnum = DirectionEnum.Up;
+console.log('\n=== 枚举 ===');
+console.log('DirectionEnum.Up:', dirEnum);
+console.log('DirectionEnum[0]:', DirectionEnum[0]);  // 反向映射
