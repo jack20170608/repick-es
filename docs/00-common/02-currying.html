@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>柯里化：从数学到 JavaScript 的优雅演进</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin-top: 40px;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 25px;
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .note {
+            background: #e8f4fd;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .note strong {
+            color: var(--accent-color);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: #e74c3c;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #abb2bf;
+            font-size: 0.85em;
+        }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-color);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+
+        blockquote {
+            border-left: 4px solid #ddd;
+            margin: 20px 0;
+            padding: 10px 20px;
+            color: #666;
+            background: #fafafa;
+        }
+
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            display: block;
+            text-align: center;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .summary-table {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-table table {
+            margin: 0;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>柯里化：从数学到 JavaScript 的优雅演进</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="01-lambda-calculus-pipeline.html">λ 演算与函数组合</a> 了解 λ 演算基础
+    </div>
+
+    <h2>一、柯里化的数学起源</h2>
+
+    <h3>1.1 多元函数的问题</h3>
+    <p>在数学中，我们经常会遇到多个参数的函数：</p>
+    <span class="math">f(x, y, z) = x + y + z</span>
+    <p>但在 λ 演算的原始定义中，λ 表达式只能接受<strong>一个参数</strong>。这似乎是一个严重的限制。</p>
+
+    <h3>1.2 哥德尔与柯里的洞见</h3>
+    <p><strong>哈斯克尔·柯里（Haskell Curry）</strong> 提出了一个革命性的思想：</p>
+    <blockquote>
+        任何多元函数都可以转化为一元函数的嵌套调用
+    </blockquote>
+    <p>数学表达：</p>
+    <span class="math">f(x, y, z) = ((f(x))(y))(z)</span>
+
+    <p>举例说明。原始函数：</p>
+    <span class="math">add(x, y) = x + y</span>
+
+    <p>柯里化后：</p>
+    <span class="math">curriedAdd(x)(y) = x + y</span>
+
+    <p>我们可以这样理解：</p>
+    <ul>
+        <li><code>curriedAdd(3)</code> 返回一个<strong>新函数</strong>，这个函数接受 <code>y</code> 并计算 <code>3 + y</code></li>
+        <li><code>curriedAdd(3)(4)</code> = 7</li>
+    </ul>
+
+    <p>这叫做<strong>柯里化（Currying）</strong>，以数学家哈斯克尔·柯里的名字命名。</p>
+
+    <h3>1.3 形式化定义</h3>
+    <p>设有一个 n 元函数 f：</p>
+    <span class="math">f: (A₁ × A₂ × … × Aₙ) → B</span>
+
+    <p>柯里化后的类型：</p>
+    <span class="math">curry(f): A₁ → (A₂ → (… → (Aₙ → B)…))</span>
+
+    <p>对应的反操作称为<strong>反柯里化（Uncurry）</strong>：</p>
+    <span class="math">uncurry(f)(x, y) = f(x)(y)</span>
+
+    <hr>
+
+    <h2>二、JavaScript 中的柯里化</h2>
+
+    <h3>2.1 基础实现</h3>
+    <p>在 ES6 中，我们可以轻松实现柯里化：</p>
+
+    <pre><code><span class="comment">// 普通的二元函数</span>
+<span class="keyword">function</span> <span class="function">add</span>(a, b) {
+  <span class="keyword">return</span> a + b;
+}
+
+<span class="comment">// 柯里化版本</span>
+<span class="keyword">function</span> <span class="function">curriedAdd</span>(a) {
+  <span class="keyword">return</span> <span class="keyword">function</span>(b) {
+    <span class="keyword">return</span> a + b;
+  };
+}
+
+<span class="comment">// 使用箭头函数更简洁</span>
+<span class="keyword">const</span> curriedAdd = a => b => a + b;</code></pre>
+
+    <p>测试：</p>
+
+    <pre><code>console.<span class="function">log</span>(<span class="function">add</span>(<span class="number">3</span>, <span class="number">4</span>));              <span class="comment">// 7</span>
+console.<span class="function">log</span>(<span class="function">curriedAdd</span>(<span class="number">3</span>)(<span class="number">4</span>));       <span class="comment">// 7</span>
+
+<span class="comment">// 惰性求值：先填充部分参数</span>
+<span class="keyword">const</span> add5 = <span class="function">curriedAdd</span>(<span class="number">5</span>);
+console.<span class="function">log</span>(add5(<span class="number">10</span>));               <span class="comment">// 15</span>
+console.<span class="function">log</span>(add5(<span class="number">20</span>));               <span class="comment">// 25</span></code></pre>
+
+    <h3>2.2 通用的柯里化函数</h3>
+    <p>如何将任意函数柯里化？我们需要编写一个<strong>高阶函数</strong>：</p>
+
+    <pre><code><span class="keyword">function</span> <span class="function">curry</span>(fn) {
+  <span class="keyword">return</span> <span class="keyword">function</span> <span class="function">curried</span>(...args) {
+    <span class="comment">// 当接收的参数数量足够时，直接调用原函数</span>
+    <span class="keyword">if</span> (args.length >= fn.length) {
+      <span class="keyword">return</span> fn.<span class="function">apply</span>(<span class="keyword">this</span>, args);
+    }
+    <span class="comment">// 否则返回一个等待更多参数的函数</span>
+    <span class="keyword">return</span> <span class="keyword">function</span>(...args2) {
+      <span class="keyword">return</span> <span class="function">curried</span>.<span class="function">apply</span>(<span class="keyword">this</span>, args.concat(args2));
+    };
+  };
+}</code></pre>
+
+    <p>使用示例：</p>
+
+    <pre><code><span class="comment">// 普通函数</span>
+<span class="keyword">function</span> <span class="function">multiply</span>(a, b, c) {
+  <span class="keyword">return</span> a * b * c;
+}
+
+<span class="comment">// 柯里化版本</span>
+<span class="keyword">const</span> curriedMultiply = <span class="function">curry</span>(multiply);
+
+console.<span class="function">log</span>(<span class="function">curriedMultiply</span>(<span class="number">2</span>)(<span class="number">3</span>)(<span class="number">4</span>));    <span class="comment">// 24</span>
+console.<span class="function">log</span>(<span class="function">curriedMultiply</span>(<span class="number">2</span>, <span class="number">3</span>)(<span class="number">4</span>));    <span class="comment">// 24</span>
+console.<span class="function">log</span>(<span class="function">curriedMultiply</span>(<span class="number">2</span>)(<span class="number">3</span>, <span class="number">4</span>));    <span class="comment">// 24</span>
+console.<span class="function">log</span>(<span class="function">curriedMultiply</span>(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>));    <span class="comment">// 24</span></code></pre>
+
+    <h3>2.3 箭头函数版本</h3>
+
+    <pre><code><span class="keyword">const</span> curry = fn => {
+  <span class="keyword">const</span> arity = fn.length;
+  <span class="keyword">return</span> <span class="keyword">function</span> <span class="function">curried</span>(...args) {
+    <span class="keyword">return</span> args.length >= arity
+      ? fn(...args)
+      : (...more) => <span class="function">curried</span>(...args, ...more);
+  };
+};</code></pre>
+
+    <hr>
+
+    <h2>三、柯里化的实际应用</h2>
+
+    <h3>3.1 函数复合</h3>
+    <p>柯里化是函数复合的基础。来看一个经典例子：</p>
+
+    <pre><code><span class="comment">// 辅助函数：函数复合</span>
+<span class="keyword">const</span> compose = (...fns) => x =>
+  fns.<span class="function">reduceRight</span>((acc, fn) => fn(acc), x);
+
+<span class="comment">// 柯里化的工具函数</span>
+<span class="keyword">const</span> prop = <span class="function">curry</span>((key, obj) => obj[key]);
+<span class="keyword">const</span> map = <span class="function">curry</span>((fn, arr) => arr.<span class="function">map</span>(fn));
+<span class="keyword">const</span> filter = <span class="function">curry</span>((fn, arr) => arr.<span class="function">filter</span>(fn));
+<span class="keyword">const</span> add = <span class="function">curry</span>((a, b) => a + b);
+
+<span class="comment">// 使用示例：获取用户名称并转为大写</span>
+<span class="keyword">const</span> users = [
+  { name: <span class="string">'alice'</span>, age: <span class="number">25</span> },
+  { name: <span class="string">'bob'</span>, age: <span class="number">30</span> },
+  { name: <span class="string">'charlie'</span>, age: <span class="number">35</span> }
+];
+
+<span class="keyword">const</span> getName = <span class="function">prop</span>(<span class="string">'name'</span>);
+<span class="keyword">const</span> upperCase = s => s.<span class="function">toUpperCase</span>();
+
+<span class="comment">// 不用柯里化</span>
+<span class="keyword">const</span> result1 = users.<span class="function">map</span>(u => u.name.<span class="function">toUpperCase</span>());
+
+<span class="comment">// 用柯里化 + 函数复合</span>
+<span class="keyword">const</span> getUpperNames = <span class="function">compose</span>(
+  <span class="function">map</span>(upperCase),
+  <span class="function">map</span>(getName)
+);
+<span class="keyword">const</span> result2 = <span class="function">getUpperNames</span>(users);
+
+console.<span class="function">log</span>(result2);  <span class="comment">// ['ALICE', 'BOB', 'CHARLIE']</span></code></pre>
+
+    <h3>3.2 延迟执行</h3>
+    <p>柯里化可以实现函数的延迟执行：</p>
+
+    <pre><code><span class="keyword">const</span> lazyAdd = <span class="function">curry</span>((a, b) => {
+  console.<span class="function">log</span>(<span class="string">'计算中...'</span>);
+  <span class="keyword">return</span> a + b;
+});
+
+<span class="keyword">const</span> add10 = <span class="function">lazyAdd</span>(<span class="number">10</span>);  <span class="comment">// 不打印 "计算中..."</span>
+console.<span class="function">log</span>(add10(<span class="number">5</span>));      <span class="comment">// 打印 "计算中..."，返回 15</span>
+console.<span class="function">log</span>(add10(<span class="number">8</span>));      <span class="comment">// 再次打印 "计算中..."，返回 18</span></code></pre>
+
+    <h3>3.3 事件处理</h3>
+    <p>在事件处理中，柯里化可以预配置处理器：</p>
+
+    <pre><code><span class="keyword">const</span> handleClick = <span class="function">curry</span>((message, event) => {
+  console.<span class="function">log</span>(message, event.target);
+});
+
+<span class="comment">// 预配置不同的事件处理器</span>
+<span class="keyword">const</span> handleSave = <span class="function">handleClick</span>(<span class="string">'保存按钮被点击：'</span>);
+<span class="keyword">const</span> handleDelete = <span class="function">handleClick</span>(<span class="string">'删除按钮被点击：'</span>);
+<span class="keyword">const</span> handleEdit = <span class="function">handleClick</span>(<span class="string">'编辑按钮被点击：'</span>);
+
+<span class="comment">// 使用</span>
+<span class="comment">// button.addEventListener('click', handleSave);</span></code></pre>
+
+    <h3>3.4 参数复用（Point-Free 风格）</h3>
+
+    <pre><code><span class="keyword">const</span> curry = fn => {
+  <span class="keyword">const</span> arity = fn.length;
+  <span class="keyword">return</span> <span class="keyword">function</span> <span class="function">curried</span>(...args) {
+    <span class="keyword">return</span> args.length >= arity
+      ? fn(...args)
+      : (...more) => <span class="function">curried</span>(...args, ...more);
+  };
+};
+
+<span class="comment">// 柯里化数组方法</span>
+<span class="keyword">const</span> map = <span class="function">curry</span>((fn, arr) => arr.<span class="function">map</span>(fn));
+<span class="keyword">const</span> filter = <span class="function">curry</span>((fn, arr) => arr.<span class="function">filter</span>(fn));
+<span class="keyword">const</span> reduce = <span class="function">curry</span>((fn, init, arr) => arr.<span class="function">reduce</span>(fn, init));
+<span class="keyword">const</span> get = <span class="function">curry</span>((key, obj) => obj[key]);
+<span class="keyword">const</span> eq = <span class="function">curry</span>((a, b) => a === b);
+
+<span class="comment">// Point-free 风格的数据转换</span>
+<span class="keyword">const</span> users = [
+  { id: <span class="number">1</span>, name: <span class="string">'Alice'</span>, score: <span class="number">85</span> },
+  { id: <span class="number">2</span>, name: <span class="string">'Bob'</span>, score: <span class="number">72</span> },
+  { id: <span class="number">3</span>, name: <span class="string">'Charlie'</span>, score: <span class="number">90</span> }
+];
+
+<span class="comment">// 提取分数大于80的用户名称</span>
+<span class="keyword">const</span> getHighScorers = <span class="function">compose</span>(
+  <span class="function">map</span>(<span class="function">get</span>(<span class="string">'name'</span>)),
+  <span class="function">filter</span>(<span class="function">compose</span>(
+    <span class="function">gte</span>(<span class="number">80</span>),
+    <span class="function">get</span>(<span class="string">'score'</span>)
+  ))
+);
+
+console.<span class="function">log</span>(<span class="function">getHighScorers</span>(users));  <span class="comment">// ['Alice', 'Charlie']</span></code></pre>
+
+    <hr>
+
+    <h2>四、柯里化与偏函数</h2>
+    <p>这两个概念经常被混淆，但它们不同：</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>概念</th>
+                <th>定义</th>
+                <th>示例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>柯里化</strong></td>
+                <td>将多元函数转换为一元函数链</td>
+                <td><code>f(x)(y)(z)</code></td>
+            </tr>
+            <tr>
+                <td><strong>偏函数</strong></td>
+                <td>预设部分参数，返回剩余参数的函数</td>
+                <td><code>partial(f, x)(y, z)</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="comment">// 柯里化：固定第一个参数</span>
+<span class="keyword">const</span> curriedAdd = a => b => a + b;
+<span class="keyword">const</span> add5 = <span class="function">curriedAdd</span>(<span class="number">5</span>);
+
+<span class="comment">// 偏函数：固定任意位置的参数</span>
+<span class="keyword">function</span> <span class="function">partial</span>(fn, ...args) {
+  <span class="keyword">return</span> fn.<span class="function">bind</span>(<span class="keyword">null</span>, ...args);
+}
+
+<span class="keyword">const</span> add5Partial = <span class="function">partial</span>(add, <span class="number">5</span>);
+console.<span class="function">log</span>(add5Partial(<span class="number">10</span>));  <span class="comment">// 15</span></code></pre>
+
+    <hr>
+
+    <h2>五、实战：用柯里化实现日志系统</h2>
+
+    <pre><code><span class="comment">// 柯里化的日志记录器</span>
+<span class="keyword">const</span> createLogger = <span class="function">curry</span>((level, tag, message) => {
+  <span class="keyword">const</span> timestamp = <span class="keyword">new</span> Date().<span class="function">toISOString</span>();
+  console.<span class="function">log</span>(<span class="string">`[${timestamp}] [${level}] [${tag}] ${message}`</span>);
+});
+
+<span class="keyword">const</span> debug = <span class="function">createLogger</span>(<span class="string">'DEBUG'</span>);
+<span class="keyword">const</span> info = <span class="function">createLogger</span>(<span class="string">'INFO'</span>);
+<span class="keyword">const</span> error = <span class="function">createLogger</span>(<span class="string">'ERROR'</span>);
+
+<span class="comment">// 预配置不同模块的日志器</span>
+<span class="keyword">const</span> logAuth = <span class="function">debug</span>(<span class="string">'Auth'</span>);
+<span class="keyword">const</span> logApi = <span class="function">debug</span>(<span class="string">'API'</span>);
+<span class="keyword">const</span> logDb = <span class="function">debug</span>(<span class="string">'Database'</span>);
+
+<span class="function">logAuth</span>(<span class="string">'User login attempt'</span>);       <span class="comment">// [DEBUG] [Auth] User login attempt</span>
+<span class="function">logApi</span>(<span class="string">'GET /api/users'</span>);            <span class="comment">// [DEBUG] [API] GET /api/users</span>
+<span class="function">logDb</span>(<span class="string">'Query executed in 5ms'</span>);      <span class="comment">// [DEBUG] [Database] Query executed in 5ms</span></code></pre>
+
+    <hr>
+
+    <h2>六、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>维度</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>数学起源</td>
+                    <td>λ 演算中处理多元函数的核心技术</td>
+                </tr>
+                <tr>
+                    <td>核心思想</td>
+                    <td>将接受多个参数的函数转换为接受单个参数的函数链</td>
+                </tr>
+                <tr>
+                    <td>JavaScript 实现</td>
+                    <td>通过闭包和箭头函数轻松实现</td>
+                </tr>
+                <tr>
+                    <td>应用场景</td>
+                    <td>函数复合、延迟执行、事件处理、Point-free 编程</td>
+                </tr>
+                <tr>
+                    <td>与偏函数的区别</td>
+                    <td>柯里化是固定的参数顺序；偏函数可以固定任意参数</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>柯里化不仅是一个数学概念，更是函数式编程的核心支柱。掌握它，你将能够写出更加优雅、简洁且可组合的代码。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">Lambda calculus - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry - Wikipedia</a></li>
+        <li><a href="https://www.sitepoint.com/currying-in-functional-javascript/" target="_blank">JavaScript Functional Programming: Currying</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>
