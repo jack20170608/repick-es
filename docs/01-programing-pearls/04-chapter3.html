@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章：数据决定程序结构 - 编程珠玑</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>第3章：数据决定程序结构 - 数据结构的重要性</h1>
+
+    <div class="note">
+        <strong>章节类型：</strong>数据结构篇 - 选择正确的数据结构
+    </div>
+
+    <h2>一、核心观点</h2>
+    <blockquote>
+        "程序的形状由数据结构决定。"
+    </blockquote>
+    <p>选择合适的数据结构能让算法更简单、更高效。</p>
+
+    <hr>
+
+    <h2>二、基本数据结构对比</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>数据结构</th>
+                <th>访问</th>
+                <th>查找</th>
+                <th>插入</th>
+                <th>删除</th>
+                <th>使用场景</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>数组</td>
+                <td>O(1)</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>需要快速随机访问</td>
+            </tr>
+            <tr>
+                <td>有序数组</td>
+                <td>O(1)</td>
+                <td>O(log n)</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>查找多，修改少</td>
+            </tr>
+            <tr>
+                <td>链表</td>
+                <td>O(n)</td>
+                <td>O(n)</td>
+                <td>O(1)</td>
+                <td>O(1)*</td>
+                <td>频繁插入删除</td>
+            </tr>
+            <tr>
+                <td>哈希表</td>
+                <td>-</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>O(1)</td>
+                <td>快速查找</td>
+            </tr>
+            <tr>
+                <td>二叉搜索树</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>有序遍历 + 查找</td>
+            </tr>
+            <tr>
+                <td>堆</td>
+                <td>-</td>
+                <td>O(1) 极值</td>
+                <td>O(log n)</td>
+                <td>O(log n)</td>
+                <td>优先级队列</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>三、典型问题与数据结构选择</h2>
+
+    <h3>3.1 LRU 缓存</h3>
+    <p>需要快速获取和删除最近最少使用的数据。</p>
+
+    <pre><code><span class="comment">// LRU 缓存：哈希表 + 双向链表</span>
+<span class="keyword">class</span> <span class="function">LRUCache</span> {
+  <span class="keyword">private</span> capacity: number;
+  <span class="keyword">private</span> cache: Map&lt;number, number&gt;;
+
+  <span class="function">constructor</span>(capacity: number) {
+    <span class="keyword">this</span>.capacity = capacity;
+    <span class="keyword">this</span>.cache = <span class="keyword">new</span> Map();
+  }
+
+  <span class="function">get</span>(key: number): number | -<span class="number">1</span> {
+    <span class="keyword">if</span> (!<span class="keyword">this</span>.cache.has(key)) <span class="keyword">return</span> -<span class="number">1</span>;
+
+    <span class="comment">// 移到末尾（最近使用）</span>
+    <span class="keyword">const</span> value = <span class="keyword">this</span>.cache.get(key)!;
+    <span class="keyword">this</span>.cache.<span class="function">delete</span>(key);
+    <span class="keyword">this</span>.cache.set(key, value);
+
+    <span class="keyword">return</span> value;
+  }
+
+  <span class="function">put</span>(key: number, value: number): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.cache.has(key)) {
+      <span class="keyword">this</span>.cache.<span class="function">delete</span>(key);
+    } <span class="keyword">else if</span> (<span class="keyword">this</span>.cache.size >= <span class="keyword">this</span>.capacity) {
+      <span class="comment">// 删除最老的（第一个）</span>
+      <span class="keyword">const</span> firstKey = <span class="keyword">this</span>.cache.keys().<span class="function">next</span>().value;
+      <span class="keyword">this</span>.cache.<span class="function">delete</span>(firstKey);
+    }
+    <span class="keyword">this</span>.cache.set(key, value);
+  }
+}</code></pre>
+
+    <h3>3.2 频率统计</h3>
+    <pre><code><span class="comment">// 统计出现频率最高的 K 个元素</span>
+<span class="keyword">function</span> <span class="function">topKFrequent</span>(nums: number[], k: number): number[] {
+  <span class="comment">// 1. 统计频率</span>
+  <span class="keyword">const</span> freq: Map&lt;number, number&gt; = <span class="keyword">new</span> Map();
+  <span class="keyword">for</span> (<span class="keyword">const</span> num of nums) {
+    freq.set(num, (freq.get(num) || <span class="number">0</span>) + <span class="number">1</span>);
+  }
+
+  <span class="comment">// 2. 按频率分组</span>
+  <span class="keyword">const</span> buckets: number[][] = [];
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i <= nums.length; i++) {
+    buckets[i] = [];
+  }
+  <span class="keyword">for</span> (<span class="keyword">const</span> [num, count] of freq) {
+    buckets[count].<span class="function">push</span>(num);
+  }
+
+  <span class="comment">// 3. 从高频到低频收集</span>
+  <span class="keyword">const</span> result: number[] = [];
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = buckets.length - <span class="number">1</span>; i >= <span class="number">0</span> && result.length < k; i--) {
+    result.<span class="function">push</span>(...buckets[i]);
+  }
+
+  <span class="keyword">return</span> result;
+}
+
+console.<span class="function">topKFrequent</span>([<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">2</span>,<span class="number">3</span>], <span class="number">2</span>);  <span class="comment">// [1, 2]</span></code></pre>
+
+    <h3>3.3 栈结构应用</h3>
+    <pre><code><span class="comment">// 有效的括号</span>
+<span class="keyword">function</span> <span class="function">isValid</span>(s: string): boolean {
+  <span class="keyword">const</span> stack: string[] = [];
+  <span class="keyword">const</span> map: Record&lt;string, string&gt; = {
+    <span class="string">'}'</span>: <span class="string">'{'</span>,
+    <span class="string">']'</span>: <span class="string">'['</span>,
+    <span class="string">')'</span>: <span class="string">'('</span>
+  };
+
+  <span class="keyword">for</span> (<span class="keyword">const</span> c of s) {
+    <span class="keyword">if</span> (<span class="string">'({['</span>.<span class="function">includes</span>(c)) {
+      stack.<span class="function">push</span>(c);
+    } <span class="keyword">else if</span> (<span class="string">')}]'</span>.<span class="function">includes</span>(c)) {
+      <span class="keyword">if</span> (stack.length === <span class="number">0</span> || stack.pop() !== map[c]) {
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+      }
+    }
+  }
+
+  <span class="keyword">return</span> stack.length === <span class="number">0</span>;
+}
+
+<span class="comment">// 表达式求值</span>
+<span class="keyword">function</span> <span class="function">evalRPN</span>(tokens: string[]): number {
+  <span class="keyword">const</span> stack: number[] = [];
+  <span class="keyword">const</span> ops: Record&lt;string, (a: number, b: number) => number&gt; = {
+    <span class="string">'+'</span>: (a, b) => a + b,
+    <span class="string">'-'</span>: (a, b) => a - b,
+    <span class="string">'*'</span>: (a, b) => a * b,
+    <span class="string">'/'</span>: (a, b) => Math.<span class="function">trunc</span>(a / b)
+  };
+
+  <span class="keyword">for</span> (<span class="keyword">const</span> token of tokens) {
+    <span class="keyword">if</span> (ops[token]) {
+      <span class="keyword">const</span> b = stack.pop()!;
+      <span class="keyword">const</span> a = stack.pop()!;
+      stack.<span class="function">push</span>(ops[token](a, b));
+    } <span class="keyword">else</span> {
+      stack.<span class="function">push</span>(Number(token));
+    }
+  }
+
+  <span class="keyword">return</span> stack[<span class="number">0</span>];
+}
+
+console.<span class="function">evalRPN</span>([<span class="string">"2"</span>, <span class="string">"1"</span>, <span class="string">"+"</span>, <span class="string">"3"</span>, <span class="string">"*"</span>]);  <span class="comment">// 9</span></code></pre>
+
+    <h3>3.4 队列结构应用</h3>
+    <pre><code><span class="comment">// 滑动窗口最大值</span>
+<span class="keyword">function</span> <span class="function">maxSlidingWindow</span>(nums: number[], k: number): number[] {
+  <span class="keyword">const</span> result: number[] = [];
+  <span class="keyword">const</span> deque: number[] = [];  <span class="comment">// 存储索引</span>
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < nums.length; i++) {
+    <span class="comment">// 移除超出窗口的元素</span>
+    <span class="keyword">if</span> (deque.length > <span class="number">0</span> && deque[<span class="number">0</span>] <= i - k) {
+      deque.<span class="function">shift</span>();
+    }
+
+    <span class="comment">// 移除比当前元素小的元素</span>
+    <span class="keyword">while</span> (deque.length > <span class="number">0</span> && nums[deque[deque.length - <span class="number">1</span>]] < nums[i]) {
+      deque.pop();
+    }
+
+    deque.<span class="function">push</span>(i);
+
+    <span class="comment">// 记录窗口最大值</span>
+    <span class="keyword">if</span> (i >= k - <span class="number">1</span>) {
+      result.<span class="function">push</span>(nums[deque[<span class="number">0</span>]]);
+    }
+  }
+
+  <span class="keyword">return</span> result;
+}
+
+console.<span class="function">maxSlidingWindow</span>([<span class="number">1</span>,<span class="number">3</span>,-<span class="number">1</span>,-<span class="number">3</span>,<span class="number">5</span>,<span class="number">3</span>,<span class="number">6</span>,<span class="number">7</span>], <span class="number">3</span>);
+<span class="comment">// [3, 3, 5, 5, 6, 7]</span></code></pre>
+
+    <hr>
+
+    <h2>四、数据结构的艺术</h2>
+
+    <h3>4.1 案例：电话号码簿</h3>
+    <pre><code><span class="comment">// 问题：按姓名查找电话号码，按电话号码查找姓名</span>
+
+<span class="comment">// 方案1：单一映射</span>
+<span class="comment">// Map&lt;name, phone&gt; - 按名字查找快</span>
+<span class="comment">// 但按电话找名字需要遍历</span>
+
+<span class="comment">// 方案2：双向映射</span>
+<span class="keyword">class</span> <span class="function">PhoneBook</span> {
+  nameToPhone: Map&lt;string, string&gt;;
+  phoneToName: Map&lt;string, string&gt;;
+
+  <span class="function">constructor</span>() {
+    <span class="keyword">this</span>.nameToPhone = <span class="keyword">new</span> Map();
+    <span class="keyword">this</span>.phoneToName = <span class="keyword">new</span> Map();
+  }
+
+  <span class="function">add</span>(name: string, phone: string): <span class="keyword">void</span> {
+    <span class="keyword">this</span>.nameToPhone.set(name, phone);
+    <span class="keyword">this</span>.phoneToName.set(phone, name);
+  }
+
+  <span class="function">findByName</span>(name: string): string | undefined {
+    <span class="keyword">return</span> <span class="keyword">this</span>.nameToPhone.get(name);
+  }
+
+  <span class="function">findByPhone</span>(phone: string): string | undefined {
+    <span class="keyword">return</span> <span class="keyword">this</span>.phoneToName.get(phone);
+  }
+}</code></pre>
+
+    <h3>4.2 案例：文本编辑器撤销</h3>
+    <pre><code><span class="comment">// 撤销功能：需要记录历史状态</span>
+<span class="keyword">class</span> <span class="function">TextEditor</span> {
+  <span class="keyword">private</span> text: string = <span class="string">""</span>;
+  <span class="keyword">private</span> undoStack: string[] = [];
+  <span class="keyword">private</span> redoStack: string[] = [];
+
+  <span class="function">type</span>(c: string): <span class="keyword">void</span> {
+    <span class="keyword">this</span>.undoStack.<span class="function">push</span>(<span class="keyword">this</span>.text);
+    <span class="keyword">this</span>.text += c;
+    <span class="keyword">this</span>.redoStack = [];  <span class="comment">// 新操作清除 redo</span>
+  }
+
+  <span class="function">undo</span>(): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.undoStack.length === <span class="number">0</span>) <span class="keyword">return</span>;
+    <span class="keyword">this</span>.redoStack.<span class="function">push</span>(<span class="keyword">this</span>.text);
+    <span class="keyword">this</span>.text = <span class="keyword">this</span>.undoStack.pop()!;
+  }
+
+  <span class="function">redo</span>(): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.redoStack.length === <span class="number">0</span>) <span class="keyword">return</span>;
+    <span class="keyword">this</span>.undoStack.<span class="function">push</span>(<span class="keyword">this</span>.text);
+    <span class="keyword">this</span>.text = <span class="keyword">this</span>.redoStack.pop()!;
+  }
+
+  <span class="function">getText</span>(): string {
+    <span class="keyword">return</span> <span class="keyword">this</span>.text;
+  }
+}</code></pre>
+
+    <hr>
+
+    <h2>五、练习题</h2>
+
+    <h3>练习 3.1：设计数据结构</h3>
+    <p>设计一个数据结构，支持以下操作（时间复杂度尽可能低）：</p>
+    <ol>
+        <li>插入一个数</li>
+        <li>获取中位数</li>
+        <li>删除中位数</li>
+    </ol>
+
+    <h3>练习 3.2：实现栈</h3>
+    <p>使用两个栈实现队列。</p>
+
+    <h3>练习 3.3：LRU 变体</h3>
+    <p>设计一个 LFU（Least Frequently Used）缓存。</p>
+
+    <hr>
+
+    <h2>六、答案提示</h2>
+
+    <h3>练习 3.1 参考：中位数数据结构</h3>
+    <pre><code><span class="comment">// 思路：两个堆 - 最大堆 + 最小堆</span>
+<span class="comment">// 最大堆：存储较小的一半</span>
+<span class="comment">// 最小堆：存储较大的一半</span>
+
+<span class="keyword">class</span> <span class="function">MedianFinder</span> {
+  <span class="keyword">private</span> low: number[] = [];   <span class="comment">// 最大堆（用负数模拟）</span>
+  <span class="keyword">private</span> high: number[] = [];  <span class="comment">// 最小堆</span>
+
+  <span class="function">addNum</span>(num: number): <span class="keyword">void</span> {
+    <span class="comment">// 插入到 low（最大堆）</span>
+    <span class="keyword">this</span>.low.<span class="function">push</span>(-num);
+    <span class="function">siftUp</span>(<span class="keyword">this</span>.low);
+    <span class="function">siftDown</span>(<span class="keyword">this</span>.low, <span class="keyword">this</span>.low.length - <span class="number">1</span>);
+
+    <span class="comment">// 平衡：low 顶部移到 high</span>
+    <span class="keyword">const</span> max = -<span class="function">pop</span>(<span class="keyword">this</span>.low);
+    <span class="keyword">this</span>.high.<span class="function">push</span>(max);
+    <span class="function">siftUp</span>(<span class="keyword">this</span>.high);
+
+    <span class="comment">// 确保 low >= high 且 low <= high + 1</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.low.length < <span class="keyword">this</span>.high.length) {
+      <span class="keyword">const</span> min = <span class="function">pop</span>(<span class="keyword">this</span>.high);
+      <span class="keyword">this</span>.low.<span class="function">push</span>(-min);
+      <span class="function">siftUp</span>(<span class="keyword">this</span>.low);
+    }
+  }
+
+  <span class="function">findMedian</span>(): number {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.low.length > <span class="keyword">this</span>.high.length) {
+      <span class="keyword">return</span> -<span class="keyword">this</span>.low[<span class="number">0</span>];
+    }
+    <span class="keyword">return</span> (-<span class="keyword">this</span>.low[<span class="number">0</span>] + <span class="keyword">this</span>.high[<span class="number">0</span>]) / <span class="number">2</span>;
+  }
+
+  <span class="keyword">private</span> <span class="function">siftUp</span>(heap: number[]): <span class="keyword">void</span> { <span class="comment">/* 上浮操作 */</span> }
+  <span class="keyword">private</span> <span class="function">siftDown</span>(heap: number[], i: number): <span class="keyword">void</span> { <span class="comment">/* 下沉操作 */</span> }
+  <span class="keyword">private</span> <span class="function">pop</span>(heap: number[]): number {
+    <span class="keyword">const</span> top = heap[<span class="number">0</span>];
+    heap[<span class="number">0</span>] = heap.<span class="function">pop</span>()!;
+    <span class="function">siftDown</span>(heap, <span class="number">0</span>);
+    <span class="keyword">return</span> top;
+  }
+}</code></pre>
+
+    <h3>练习 3.2 参考：栈实现队列</h3>
+    <pre><code><span class="comment">// 两个栈实现队列</span>
+<span class="keyword">class</span> <span class="function">QueueWithStacks</span> {
+  <span class="keyword">private</span> inStack: number[] = [];
+  <span class="keyword">private</span> outStack: number[] = [];
+
+  <span class="function">push</span>(x: number): <span class="keyword">void</span> {
+    <span class="keyword">this</span>.inStack.<span class="function">push</span>(x);
+  }
+
+  <span class="function">pop</span>(): number {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.outStack.length === <span class="number">0</span>) {
+      <span class="keyword">while</span> (<span class="keyword">this</span>.inStack.length > <span class="number">0</span>) {
+        <span class="keyword">this</span>.outStack.<span class="function">push</span>(<span class="keyword">this</span>.inStack.pop()!);
+      }
+    }
+    <span class="keyword">return</span> <span class="keyword">this</span>.outStack.pop()!;
+  }
+
+  <span class="function">peek</span>(): number {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.outStack.length === <span class="number">0</span>) {
+      <span class="keyword">while</span> (<span class="keyword">this</span>.inStack.length > <span class="number">0</span>) {
+        <span class="keyword">this</span>.outStack.<span class="function">push</span>(<span class="keyword">this</span>.inStack.pop()!);
+      }
+    }
+    <span class="keyword">return</span> <span class="keyword">this</span>.outStack[<span class="keyword">this</span>.outStack.length - <span class="number">1</span>];
+  }
+
+  <span class="function">empty</span>(): boolean {
+    <span class="keyword">return</span> <span class="keyword">this</span>.inStack.length === <span class="number">0</span> && <span class="keyword">this</span>.outStack.length === <span class="number">0</span>;
+  }
+}</code></pre>
+
+    <hr>
+
+    <h2>七、本章总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>核心原则</th>
+                    <th>实践要点</th>
+                </tr>
+                <tr>
+                    <td>数据结构决定算法</td>
+                    <td>先选对数据结构，再谈算法</td>
+                </tr>
+                <tr>
+                    <td>了解复杂度</td>
+                    <td>根据操作频率选择合适的数据结构</td>
+                </tr>
+                <tr>
+                    <td>组合使用</td>
+                    <td>多个数据结构组合往往效果更好</td>
+                </tr>
+                <tr>
+                    <td>具体问题具体分析</td>
+                    <td>没有最好的数据结构，只有最合适的</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

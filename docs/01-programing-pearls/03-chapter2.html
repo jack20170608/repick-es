@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2章：啊哈！算法 - 编程珠玑</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>第2章：啊哈！算法 - 基础算法思想</h1>
+
+    <div class="note">
+        <strong>章节类型：</strong>算法篇 - 认识经典算法
+    </div>
+
+    <h2>一、核心算法概述</h2>
+
+    <h3>1.1 二分搜索</h3>
+    <p>二分搜索是"啊哈"时刻的典型代表——简单但极其高效。</p>
+
+    <pre><code><span class="comment">// 二分搜索 - 寻找目标值</span>
+<span class="keyword">function</span> <span class="function">binarySearch</span>&lt;T&gt;(arr: T[], target: T, compare: (a: T, b: T) => number): number {
+  <span class="keyword">let</span> left = <span class="number">0</span>;
+  <span class="keyword">let</span> right = arr.length - <span class="number">1</span>;
+
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+    <span class="keyword">const</span> cmp = compare(arr[mid], target);
+
+    <span class="keyword">if</span> (cmp === <span class="number">0</span>) {
+      <span class="keyword">return</span> mid;
+    } <span class="keyword">else if</span> (cmp < <span class="number">0</span>) {
+      left = mid + <span class="number">1</span>;
+    } <span class="keyword">else</span> {
+      right = mid - <span class="number">1</span>;
+    }
+  }
+
+  <span class="keyword">return</span> -<span class="number">1</span>;
+}
+
+<span class="comment">// 使用示例</span>
+<span class="keyword">const</span> sorted = [<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">15</span>];
+console.<span class="function">log</span>(<span class="function">binarySearch</span>(sorted, <span class="number">7</span>, (a, b) => a - b));  <span class="comment">// 3</span>
+console.<span class="function">log</span>(<span class="function">binarySearch</span>(sorted, <span class="number">6</span>, (a, b) => a - b));  <span class="comment">// -1</span></code></pre>
+
+    <h3>1.2 插入排序</h3>
+    <p>简单但 O(n²) 复杂度，适合小规模数据。</p>
+
+    <pre><code><span class="comment">// 插入排序</span>
+<span class="keyword">function</span> <span class="function">insertionSort</span>(arr: number[]): number[] {
+  <span class="keyword">const</span> result = [...arr];  <span class="comment">// 复制数组</span>
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < result.length; i++) {
+    <span class="keyword">const</span> key = result[i];
+    <span class="keyword">let</span> j = i - <span class="number">1</span>;
+
+    <span class="comment">// 将比 key 大的元素向后移动</span>
+    <span class="keyword">while</span> (j >= <span class="number">0</span> && result[j] > key) {
+      result[j + <span class="number">1</span>] = result[j];
+      j--;
+    }
+
+    result[j + <span class="number">1</span>] = key;
+  }
+
+  <span class="keyword">return</span> result;
+}
+
+<span class="comment">// 测试</span>
+console.<span class="function">log</span>(<span class="function">insertionSort</span>([<span class="number">64</span>, <span class="number">34</span>, <span class="number">25</span>, <span class="number">12</span>, <span class="number">22</span>, <span class="number">11</span>, <span class="number">90</span>]));
+<span class="comment">// [11, 12, 22, 25, 34, 64, 90]</span></code></pre>
+
+    <hr>
+
+    <h2>二、时间复杂度分析</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>复杂度</th>
+                <th>名称</th>
+                <th>示例算法</th>
+                <th>10条数据</th>
+                <th>1000条数据</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>O(1)</td>
+                <td>常数时间</td>
+                <td>数组访问</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>O(log n)</td>
+                <td>对数时间</td>
+                <td>二分搜索</td>
+                <td>3</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>O(n)</td>
+                <td>线性时间</td>
+                <td>遍历</td>
+                <td>10</td>
+                <td>1000</td>
+            </tr>
+            <tr>
+                <td>O(n log n)</td>
+                <td>线性对数时间</td>
+                <td>快速排序</td>
+                <td>30</td>
+                <td>10000</td>
+            </tr>
+            <tr>
+                <td>O(n²)</td>
+                <td>平方时间</td>
+                <td>插入排序</td>
+                <td>100</td>
+                <td>1000000</td>
+            </tr>
+            <tr>
+                <td>O(2ⁿ)</td>
+                <td>指数时间</td>
+                <td>递归斐波那契</td>
+                <td>1024</td>
+                <td>巨大</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>三、经典问题的算法解法</h2>
+
+    <h3>3.1 变位词检测</h3>
+    <p>检测两个字符串是否由相同字符组成（可重排）。</p>
+
+    <pre><code><span class="comment">// 方法1：排序后比较 - O(n log n)</span>
+<span class="keyword">function</span> <span class="function">isAnagram1</span>(s1: string, s2: string): boolean {
+  <span class="keyword">const</span> sort = (s: string) => s.<span class="function">split</span>(<span class="string">''</span>).<span class="function">sort</span>().<span class="function">join</span>(<span class="string">''</span>);
+  <span class="keyword">return</span> <span class="function">sort</span>(s1) === <span class="function">sort</span>(s2);
+}
+
+<span class="comment">// 方法2：计数 - O(n)</span>
+<span class="keyword">function</span> <span class="function">isAnagram2</span>(s1: string, s2: string): boolean {
+  <span class="keyword">if</span> (s1.length !== s2.length) <span class="keyword">return</span> <span class="keyword">false</span>;
+
+  <span class="keyword">const</span> count: Record&lt;string, number&gt; = {};
+
+  <span class="keyword">for</span> (<span class="keyword">const</span> c of s1) {
+    count[c] = (count[c] || <span class="number">0</span>) + <span class="number">1</span>;
+  }
+
+  <span class="keyword">for</span> (<span class="keyword">const</span> c of s2) {
+    <span class="keyword">if</span> (!count[c]) <span class="keyword">return</span> <span class="keyword">false</span>;
+    count[c]--;
+  }
+
+  <span class="keyword">return</span> <span class="keyword">true</span>;
+}
+
+<span class="comment">// 测试</span>
+console.<span class="function">log</span>(<span class="function">isAnagram1</span>(<span class="string">"listen"</span>, <span class="string">"silent"</span>));  <span class="comment">// true</span>
+console.<span class="function">isAnagram2</span>(<span class="string">"listen"</span>, <span class="string">"silent"</span>));  <span class="comment">// true</span></code></pre>
+
+    <h3>3.2 数组元素唯一性检测</h3>
+    <pre><code><span class="comment">// 方法1：排序后检查 - O(n log n)</span>
+<span class="keyword">function</span> <span class="function">hasUnique1</span>&lt;T&gt;(arr: T[]): boolean {
+  <span class="keyword">const</span> sorted = [...arr].<span class="function">sort</span>();
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < sorted.length; i++) {
+    <span class="keyword">if</span> (sorted[i] === sorted[i - <span class="number">1</span>]) <span class="keyword">return</span> <span class="keyword">false</span>;
+  }
+  <span class="keyword">return</span> <span class="keyword">true</span>;
+}
+
+<span class="comment">// 方法2：Set - O(n)</span>
+<span class="keyword">function</span> <span class="function">hasUnique2</span>&lt;T&gt;(arr: T[]): boolean {
+  <span class="keyword">return</span> <span class="keyword">new</span> Set(arr).size === arr.length;
+}
+
+<span class="comment">// 方法3：哈希表 - O(n)</span>
+<span class="keyword">function</span> <span class="function">hasUnique3</span>&lt;T&gt;(arr: T[]): boolean {
+  <span class="keyword">const</span> seen = <span class="keyword">new</span> Set&lt;T&gt;();
+  <span class="keyword">for</span> (<span class="keyword">const</span> item of arr) {
+    <span class="keyword">if</span> (seen.has(item)) <span class="keyword">return</span> <span class="keyword">false</span>;
+    seen.add(item);
+  }
+  <span class="keyword">return</span> <span class="keyword">true</span>;
+}
+
+<span class="comment">// 测试</span>
+console.<span class="function">log</span>(<span class="function">hasUnique1</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]));  <span class="comment">// true</span>
+console.<span class="function">log</span>(<span class="function">hasUnique1</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>]))  <span class="comment">// false</span></code></pre>
+
+    <h3>3.3 旋转矩阵</h3>
+    <p>将 N×N 矩阵旋转 90 度。</p>
+
+    <pre><code><span class="comment">// 原地旋转 - O(N²)，O(1) 空间</span>
+<span class="keyword">function</span> <span class="function">rotateMatrix</span>(matrix: number[][]): <span class="keyword">void</span> {
+  <span class="keyword">const</span> n = matrix.length;
+
+  <span class="comment">// 按层旋转</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> layer = <span class="number">0</span>; layer < n / <span class="number">2</span>; layer++) {
+    <span class="keyword">const</span> first = layer;
+    <span class="keyword">const</span> last = n - <span class="number">1</span> - layer;
+
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = first; i < last; i++) {
+      <span class="keyword">const</span> offset = i - first;
+
+      <span class="comment">// 保存上边</span>
+      <span class="keyword">const</span> top = matrix[first][i];
+
+      <span class="comment">// 左 → 上</span>
+      matrix[first][i] = matrix[last - offset][first];
+
+      <span class="comment">// 下 → 左</span>
+      matrix[last - offset][first] = matrix[last][last - offset];
+
+      <span class="comment">// 右 → 下</span>
+      matrix[last][last - offset] = matrix[i][last];
+
+      <span class="comment">// 上 → 右</span>
+      matrix[i][last] = top;
+    }
+  }
+}
+
+<span class="comment">// 测试</span>
+<span class="keyword">const</span> matrix = [
+  [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],
+  [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>],
+  [<span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]
+];
+<span class="function">rotateMatrix</span>(matrix);
+console.<span class="function">log</span>(matrix);
+<span class="comment">// [7, 4, 1]</span>
+<span class="comment">// [8, 5, 2]</span>
+<span class="comment">// [9, 6, 3]</span></code></pre>
+
+    <hr>
+
+    <h2>四、练习题</h2>
+
+    <h3>练习 2.1：二分搜索变体</h3>
+    <p>实现一个函数，在旋转排序数组中查找目标值。</p>
+    <pre><code><span class="comment">// 例如：[4, 5, 6, 7, 0, 1, 2] 查找 0，返回索引 4</span>
+<span class="comment">// 查找 3，返回 -1</span></code></pre>
+
+    <h3>练习 2.2：归并排序</h3>
+    <p>实现归并排序算法。</p>
+
+    <h3>练习 2.3：字符串所有排列</h3>
+    <p>实现字符串所有排列的算法。</p>
+
+    <h3>练习 2.4：最大子数组和</h3>
+    <p>使用分治法解决最大子数组和问题。</p>
+
+    <h3>练习 2.5：两数之和</h3>
+    <p>在数组中找到和为目标值的两个数的索引。</p>
+
+    <hr>
+
+    <h2>五、答案提示</h2>
+
+    <h3>练习 2.1 参考：旋转数组二分搜索</h3>
+    <pre><code><span class="keyword">function</span> <span class="function">searchRotated</span>(nums: number[], target: number): number {
+  <span class="keyword">let</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;
+
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+
+    <span class="keyword">if</span> (nums[mid] === target) <span class="keyword">return</span> mid;
+
+    <span class="comment">// 左边有序</span>
+    <span class="keyword">if</span> (nums[left] <= nums[mid]) {
+      <span class="keyword">if</span> (target >= nums[left] && target < nums[mid]) {
+        right = mid - <span class="number">1</span>;
+      } <span class="keyword">else</span> {
+        left = mid + <span class="number">1</span>;
+      }
+    } <span class="keyword">else</span> {
+      <span class="comment">// 右边有序</span>
+      <span class="keyword">if</span> (target > nums[mid] && target <= nums[right]) {
+        left = mid + <span class="number">1</span>;
+      } <span class="keyword">else</span> {
+        right = mid - <span class="number">1</span>;
+      }
+    }
+  }
+
+  <span class="keyword">return</span> -<span class="number">1</span>;
+}</code></pre>
+
+    <h3>练习 2.2 参考：归并排序</h3>
+    <pre><code><span class="keyword">function</span> <span class="function">mergeSort</span>(arr: number[]): number[] {
+  <span class="keyword">if</span> (arr.length <= <span class="number">1</span>) <span class="keyword">return</span> arr;
+
+  <span class="keyword">const</span> mid = Math.<span class="function">floor</span>(arr.length / <span class="number">2</span>);
+  <span class="keyword">const</span> left = <span class="function">mergeSort</span>(arr.<span class="function">slice</span>(<span class="number">0</span>, mid));
+  <span class="keyword">const</span> right = <span class="function">mergeSort</span>(arr.<span class="function">slice</span>(mid));
+
+  <span class="keyword">return</span> <span class="function">merge</span>(left, right);
+}
+
+<span class="keyword">function</span> <span class="function">merge</span>(left: number[], right: number[]): number[] {
+  <span class="keyword">const</span> result: number[] = [];
+  <span class="keyword">let</span> i = <span class="number">0</span>, j = <span class="number">0</span>;
+
+  <span class="keyword">while</span> (i < left.length && j < right.length) {
+    <span class="keyword">if</span> (left[i] <= right[j]) {
+      result.<span class="function">push</span>(left[i++]);
+    } <span class="keyword">else</span> {
+      result.<span class="function">push</span>(right[j++]);
+    }
+  }
+
+  <span class="keyword">return</span> result.<span class="function">concat</span>(left.<span class="function">slice</span>(i)).<span class="function">concat</span>(right.<span class="function">slice</span>(j));
+}</code></pre>
+
+    <h3>练习 2.4 参考：最大子数组和（Kadane 算法）</h3>
+    <pre><code><span class="comment">// 方法1：动态规划 O(n)</span>
+<span class="keyword">function</span> <span class="function">maxSubArray</span>(nums: number[]): number {
+  <span class="keyword">let</span> maxSum = nums[<span class="number">0</span>];
+  <span class="keyword">let</span> currentSum = nums[<span class="number">0</span>];
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < nums.length; i++) {
+    currentSum = Math.<span class="function">max</span>(nums[i], currentSum + nums[i]);
+    maxSum = Math.<span class="function">max</span>(maxSum, currentSum);
+  }
+
+  <span class="keyword">return</span> maxSum;
+}
+
+<span class="comment">// 方法2：分治法 O(n log n)</span>
+<span class="keyword">function</span> <span class="function">maxSubArrayDivide</span>(nums: number[]): number {
+  <span class="keyword">function</span> <span class="function">divide</span>(left: number, right: number): number {
+    <span class="keyword">if</span> (left === right) <span class="keyword">return</span> nums[left];
+
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+    <span class="keyword">const</span> leftMax = <span class="function">divide</span>(left, mid);
+    <span class="keyword">const</span> rightMax = <span class="function">divide</span>(mid + <span class="number">1</span>, right);
+
+    <span class="comment">// 跨越中点的最大子数组</span>
+    <span class="keyword">let</span> leftSum = -Infinity, sum = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = mid; i >= left; i--) {
+      sum += nums[i];
+      leftSum = Math.<span class="function">max</span>(leftSum, sum);
+    }
+
+    <span class="keyword">let</span> rightSum = -Infinity; sum = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = mid + <span class="number">1</span>; i <= right; i++) {
+      sum += nums[i];
+      rightSum = Math.<span class="function">max</span>(rightSum, sum);
+    }
+
+    <span class="keyword">return</span> Math.<span class="function">max</span>(leftMax, rightMax, leftSum + rightSum);
+  }
+
+  <span class="keyword">return</span> <span class="function">divide</span>(<span class="number">0</span>, nums.length - <span class="number">1</span>);
+}</code></pre>
+
+    <h3>练习 2.5 参考：两数之和</h3>
+    <pre><code><span class="comment">// 方法1：暴力 O(n²)</span>
+<span class="keyword">function</span> <span class="function">twoSum1</span>(nums: number[], target: number): number[] {
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < nums.length; i++) {
+    <span class="keyword">for</span> (<span class="keyword">let</span> j = i + <span class="number">1</span>; j < nums.length; j++) {
+      <span class="keyword">if</span> (nums[i] + nums[j] === target) {
+        <span class="keyword">return</span> [i, j];
+      }
+    }
+  }
+  <span class="keyword">return</span> [];
+}
+
+<span class="comment">// 方法2：哈希表 O(n)</span>
+<span class="keyword">function</span> <span class="function">twoSum2</span>(nums: number[], target: number): number[] {
+  <span class="keyword">const</span> map = <span class="keyword">new</span> Map&lt;number, number&gt;();
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < nums.length; i++) {
+    <span class="keyword">const</span> complement = target - nums[i];
+    <span class="keyword">if</span> (map.has(complement)) {
+      <span class="keyword">return</span> [map.get(complement)!, i];
+    }
+    map.set(nums[i], i);
+  }
+
+  <span class="keyword">return</span> [];
+}</code></pre>
+
+    <hr>
+
+    <h2>六、本章总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>算法</th>
+                    <th>时间复杂度</th>
+                    <th>空间复杂度</th>
+                </tr>
+                <tr>
+                    <td>二分搜索</td>
+                    <td>O(log n)</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>插入排序</td>
+                    <td>O(n²)</td>
+                    <td>O(1)</td>
+                </tr>
+                <tr>
+                    <td>归并排序</td>
+                    <td>O(n log n)</td>
+                    <td>O(n)</td>
+                </tr>
+                <tr>
+                    <td>快速排序</td>
+                    <td>O(n log n) 平均</td>
+                    <td>O(log n)</td>
+                </tr>
+                <tr>
+                    <td>哈希查找</td>
+                    <td>O(1) 平均</td>
+                    <td>O(n)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

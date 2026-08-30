@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第4章：编写正确的程序 - 编程珠玑</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>第4章：编写正确的程序 - 程序正确性</h1>
+
+    <div class="note">
+        <strong>章节类型：</strong>方法论篇 - 正确性验证与调试
+    </div>
+
+    <h2>一、核心观点</h2>
+    <blockquote>
+        "正确的程序还不够，还要确保它是<strong>正确</strong>的。"
+    </blockquote>
+    <p>本章探讨如何编写和验证正确的程序。</p>
+
+    <hr>
+
+    <h2>二、调试策略</h2>
+
+    <h3>2.1 调试的基本原则</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>原则</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>最小复现</td>
+                <td>找到能复现 bug 的最小输入</td>
+            </tr>
+            <tr>
+                <td>二分查找</td>
+                <td>逐步缩小问题范围</td>
+            </tr>
+            <tr>
+                <td>一次只改一个</td>
+                <td>避免引入新问题</td>
+            </tr>
+            <tr>
+                <td>记录假设</td>
+                <td>写下你认为正确的假设</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 调试技巧</h3>
+    <pre><code><span class="comment">// 技巧1：打印关键变量</span>
+<span class="keyword">function</span> <span class="function">buggyFunction</span>(input) {
+  console.<span class="function">log</span>(<span class="string">"Input:"</span>, input);  <span class="comment">// 调试输出</span>
+
+  <span class="keyword">let</span> result = <span class="number">0</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < input.length; i++) {
+    result += input[i];
+    console.<span class="function">log</span>(<span class="string">"i:"</span>, i, <span class="string">"result:"</span>, result);  <span class="comment">// 跟踪</span>
+  }
+
+  <span class="keyword">return</span> result;
+}
+
+<span class="comment">// 技巧2：断言检查</span>
+<span class="keyword">function</span> <span class="function">divide</span>(a, b) {
+  console.<span class="function">assert</span>(b !== <span class="number">0</span>, <span class="string">"除数不能为0"</span>);
+  <span class="keyword">return</span> a / b;
+}
+
+<span class="comment">// 技巧3：类型检查</span>
+<span class="keyword">function</span> <span class="function">process</span>(data) {
+  <span class="keyword">if</span> (<span class="keyword">typeof</span> data !== <span class="string">'object'</span> || data === <span class="keyword">null</span>) {
+    <span class="keyword">throw new</span> Error(<span class="string">"Invalid input: expected object"</span>);
+  }
+  <span class="comment">// 处理...</span>
+}</code></pre>
+
+    <hr>
+
+    <h2>三、断言的使用</h2>
+
+    <h3>3.1 防御性编程</h3>
+    <pre><code><span class="comment">// 断言：验证程序状态的假设</span>
+<span class="keyword">function</span> <span class="function">binarySearch</span>&lt;T&gt;(arr: T[], target: T): number {
+  <span class="comment">// 前置条件</span>
+  console.<span class="function">assert</span>(arr.length > <span class="number">0</span>, <span class="string">"数组不能为空"</span>);
+
+  <span class="keyword">let</span> left = <span class="number">0</span>;
+  <span class="keyword">let</span> right = arr.length - <span class="number">1</span>;
+
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+
+    <span class="comment">// 不变式：left <= mid <= right</span>
+    console.<span class="function">assert</span>(left <= mid && mid <= right, <span class="string">"索引越界"</span>);
+
+    <span class="keyword">if</span> (arr[mid] === target) <span class="keyword">return</span> mid;
+    <span class="keyword">if</span> (arr[mid] < target) left = mid + <span class="number">1</span>;
+    <span class="keyword">else</span> right = mid - <span class="number">1</span>;
+  }
+
+  <span class="comment">// 后置条件</span>
+  console.<span class="function">assert</span>(left === right + <span class="number">1</span>, <span class="string">"搜索结束"</span>);
+
+  <span class="keyword">return</span> -<span class="number">1</span>;
+}</code></pre>
+
+    <h3>3.2 契约式设计</h3>
+    <pre><code><span class="comment">// 契约式设计：前置条件 + 后置条件</span>
+
+<span class="comment">// 排序函数的契约</span>
+<span class="keyword">function</span> <span class="function">sort</span>(arr: number[]): number[] {
+  <span class="comment">// 前置条件：输入是数组</span>
+  console.<span class="function">assert</span>(Array.isArray(arr), <span class="string">"输入必须是数组"</span>);
+
+  <span class="comment">// 核心逻辑</span>
+  <span class="keyword">const</span> result = [...arr].<span class="function">sort</span>((a, b) => a - b);
+
+  <span class="comment">// 后置条件1：长度不变</span>
+  console.<span class="function">assert</span>(result.length === arr.length, <span class="string">"长度改变"</span>);
+
+  <span class="comment">// 后置条件2：已排序</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < result.length; i++) {
+    console.<span class="function">assert</span>(result[i - <span class="number">1</span>] <= result[i], <span class="string">"未排序"</span>);
+  }
+
+  <span class="comment">// 后置条件3：是原数组的排列</span>
+  console.<span class="function">assert</span>(
+    [...arr].<span class="function">sort</span>((a, b) => a - b).<span class="function">every</span>((v, i) => v === result[i]),
+    <span class="string">"不是原数组的排列"</span>
+  );
+
+  <span class="keyword">return</span> result;
+}</code></pre>
+
+    <hr>
+
+    <h2>四、测试驱动开发</h2>
+
+    <h3>4.1 TDD 流程</h3>
+    <pre><code><span class="comment">// 红-绿-重构循环
+
+// 1. 红：写一个失败的测试
+<span class="keyword">test</span>(<span class="string">'计算阶乘'</span>, () => {
+  expect(<span class="function">factorial</span>(<span class="number">5</span>)).<span class="function">toBe</span>(<span class="number">120</span>);
+});
+
+<span class="comment">// 2. 绿：写最简代码让测试通过</span>
+<span class="keyword">function</span> <span class="function">factorial</span>(n) {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> <span class="number">1</span>;
+  <span class="keyword">return</span> n * <span class="function">factorial</span>(n - <span class="number">1</span>);
+}
+
+<span class="comment">// 3. 重构：优化代码</span>
+<span class="keyword">function</span> <span class="function">factorial</span>(n, acc = <span class="number">1</span>) {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> acc;
+  <span class="keyword">return</span> <span class="function">factorial</span>(n - <span class="number">1</span>, n * acc);
+}</code></pre>
+
+    <h3>4.2 边界测试</h3>
+    <pre><code><span class="comment">// 边界条件测试</span>
+<span class="keyword">function</span> <span class="function">test</span>() {
+  <span class="comment">// 1. 空输入</span>
+  assert(<span class="function">binarySearch</span>([], <span class="number">1</span>) === -<span class="number">1</span>);
+
+  <span class="comment">// 2. 单元素</span>
+  assert(<span class="function">binarySearch</span>([<span class="number">1</span>], <span class="number">1</span>) === <span class="number">0</span>);
+  assert(<span class="function">binarySearch</span>([<span class="number">1</span>], <span class="number">2</span>) === -<span class="number">1</span>);
+
+  <span class="comment">// 3. 重复元素</span>
+  assert(<span class="function">binarySearch</span>([<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], <span class="number">1</span>) >= <span class="number">0</span>);
+
+  <span class="comment">// 4. 负数</span>
+  assert(<span class="function">binarySearch</span>([-<span class="number">5</span>, <span class="number">0</span>, <span class="number">5</span>], <span class="number">0</span>) === <span class="number">1</span>);
+
+  <span class="comment">// 5. 极端值</span>
+  assert(<span class="function">binarySearch</span>([<span class="number">1</span>, <span class="number">1000000</span>], <span class="number">1000000</span>) === <span class="number">1</span>);
+}</code></pre>
+
+    <hr>
+
+    <h2>五、程序正确性验证</h2>
+
+    <h3>5.1 循环不变式</h3>
+    <pre><code><span class="comment">// 二分搜索的循环不变式</span>
+<span class="keyword">function</span> <span class="function">binarySearch</span>(arr, target) {
+  <span class="keyword">let</span> left = <span class="number">0</span>;
+  <span class="keyword">let</span> right = arr.length - <span class="number">1</span>;
+
+  <span class="comment">// 循环不变式：target 如果在 arr 中，必在 [left, right] 范围内</span>
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+
+    <span class="keyword">if</span> (arr[mid] === target) <span class="keyword">return</span> mid;
+    <span class="keyword">if</span> (arr[mid] < target) left = mid + <span class="number">1</span>;
+    <span class="keyword">else</span> right = mid - <span class="number">1</span>;
+
+    <span class="comment">// 每次迭代后，不变式依然成立</span>
+  }
+
+  <span class="comment">// 循环结束：left > right，target 不在范围内</span>
+  <span class="keyword">return</span> -<span class="number">1</span>;
+}</code></pre>
+
+    <h3>5.2 数学归纳法验证</h3>
+    <pre><code><span class="comment">// 用数学归纳法验证递归函数</span>
+<span class="comment">// 验证：sum(n) = 1 + 2 + ... + n = n(n+1)/2</span>
+
+<span class="comment">// 基例：n = 0</span>
+<span class="comment">// sum(0) = 0</span>
+<span class="comment">// 0 * 1 / 2 = 0 ✓</span>
+
+<span class="comment">// 归纳假设：假设 sum(k) = k(k+1)/2</span>
+
+<span class="comment">// 归纳步骤：证明 sum(k+1) = (k+1)(k+2)/2</span>
+<span class="comment">// sum(k+1) = sum(k) + (k+1)</span>
+<span class="comment">//          = k(k+1)/2 + (k+1)</span>
+<span class="comment">//          = k(k+1)/2 + 2(k+1)/2</span>
+<span class="comment">//          = (k+2)(k+1)/2</span>
+<span class="comment">//          = (k+1)(k+2)/2 ✓</span>
+
+<span class="keyword">function</span> <span class="function">sum</span>(n: number): number {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;
+  <span class="keyword">return</span> n + <span class="function">sum</span>(n - <span class="number">1</span>);
+}
+
+<span class="comment">// 验证</span>
+<span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i <= <span class="number">100</span>; i++) {
+  console.<span class="function">assert</span>(
+    <span class="function">sum</span>(i) === i * (i + <span class="number">1</span>) / <span class="number">2</span>,
+    <span class="string">`sum(${i}) 验证失败`</span>
+  );
+}</code></pre>
+
+    <hr>
+
+    <h2>六、练习题</h2>
+
+    <h3>练习 4.1：验证插入排序</h3>
+    <p>为插入排序编写断言和测试，验证其正确性。</p>
+
+    <h3>练习 4.2：循环不变式</h3>
+    <p>为冒泡排序找出循环不变式。</p>
+
+    <h3>练习 4.3：数学归纳法</h3>
+    <p>用数学归纳法验证快速排序的正确性。</p>
+
+    <h3>练习 4.4：边界测试</h3>
+    <p>为以下函数编写完整的边界测试：</p>
+    <pre><code><span class="comment">// 反转字符串</span>
+<span class="keyword">function</span> <span class="function">reverse</span>(s: string): string {
+  <span class="keyword">return</span> s.<span class="function">split</span>(<span class="string">''</span>).<span class="function">reverse</span>().<span class="function">join</span>(<span class="string">''</span>);
+}</code></pre>
+
+    <hr>
+
+    <h2>七、答案提示</h2>
+
+    <h3>练习 4.1 参考：插入排序验证</h3>
+    <pre><code><span class="keyword">function</span> <span class="function">insertionSort</span>(arr: number[]): number[] {
+  <span class="comment">// 验证输入</span>
+  console.<span class="function">assert</span>(Array.isArray(arr), <span class="string">"输入必须是数组"</span>);
+
+  <span class="keyword">const</span> result = [...arr];  <span class="comment">// 不修改原数组</span>
+
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < result.length; i++) {
+    <span class="keyword">const</span> key = result[i];
+    <span class="keyword">let</span> j = i - <span class="number">1</span>;
+
+    <span class="comment">// 循环不变式：result[0...i-1] 已排序</span>
+    <span class="keyword">for</span> (<span class="keyword">let</span> k = <span class="number">0</span>; k < i; k++) {
+      console.<span class="function">assert</span>(
+        k === <span class="number">0</span> || result[k - <span class="number">1</span>] <= result[k],
+        <span class="string">"数组未排序"</span>
+      );
+    }
+
+    <span class="keyword">while</span> (j >= <span class="number">0</span> && result[j] > key) {
+      result[j + <span class="number">1</span>] = result[j];
+      j--;
+    }
+    result[j + <span class="number">1</span>] = key;
+  }
+
+  <span class="comment">// 验证输出：已排序</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i < result.length; i++) {
+    console.<span class="function">assert</span>(result[i - <span class="number">1</span>] <= result[i], <span class="string">"结果未排序"</span>);
+  }
+
+  <span class="comment">// 验证输出：是原数组的排列</span>
+  console.<span class="function">assert</span>(
+    result.<span class="function">sort</span>((a, b) => a - b).<span class="function">every</span>((v, i) => v === [...arr].<span class="function">sort</span>((a, b) => a - b)[i]),
+    <span class="string">"不是原数组的排列"</span>
+  );
+
+  <span class="keyword">return</span> result;
+}</code></pre>
+
+    <h3>练习 4.4 参考：边界测试</h3>
+    <pre><code><span class="keyword">function</span> <span class="function">testReverse</span>() {
+  <span class="comment">// 1. 空字符串</span>
+  assert(<span class="function">reverse</span>(<span class="string">""</span>) === <span class="string">""</span>);
+
+  <span class="comment">// 2. 单字符</span>
+  assert(<span class="function">reverse</span>(<span class="string">"a"</span>) === <span class="string">"a"</span>);
+
+  <span class="comment">// 3. 双字符</span>
+  assert(<span class="function">reverse</span>(<span class="string">"ab"</span>) === <span class="string">"ba"</span>);
+
+  <span class="comment">// 4. 回文</span>
+  assert(<span class="function">reverse</span>(<span class="string">"aba"</span>) === <span class="string">"aba"</span>);
+
+  <span class="comment">// 5. 包含特殊字符</span>
+  assert(<span class="function">reverse</span>(<span class="string">"a b"</span>) === <span class="string">"b a"</span>);
+
+  <span class="comment">// 6. 中文</span>
+  assert(<span class="function">reverse</span>(<span class="string">"你好"</span>) === <span class="string">好你"</span>);
+
+  <span class="comment">// 7. Emoji</span>
+  assert(<span class="function">reverse</span>(<span class="string">"👨‍👩‍👧‍👦"</span>).length === <span class="string">"👨‍👩‍👧‍👦"</span>.length);
+
+  <span class="comment">// 8. 恒等性：reverse(reverse(s)) === s</span>
+  <span class="keyword">const</span> s = <span class="string">"Hello World!"</span>;
+  assert(<span class="function">reverse</span>(<span class="function">reverse</span>(s)) === s);
+}</code></pre>
+
+    <hr>
+
+    <h2>八、本章总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>技术</th>
+                    <th>作用</th>
+                </tr>
+                <tr>
+                    <td>断言</td>
+                    <td>验证程序状态的假设</td>
+                </tr>
+                <tr>
+                    <td>不变式</td>
+                    <td>循环中保持不变的条件</td>
+                </tr>
+                <tr>
+                    <td>数学归纳法</td>
+                    <td>验证递归算法的正确性</td>
+                </tr>
+                <tr>
+                    <td>边界测试</td>
+                    <td>测试极端和特殊情况</td>
+                </tr>
+                <tr>
+                    <td>TDD</td>
+                    <td>测试驱动开发</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>
