@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6章：程序性能分析 - 编程珠玑</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>第6章：程序性能分析 - 理解程序性能</h1>
+
+    <div class="note">
+        <strong>章节类型：</strong>性能篇 - 性能分析与优化基础
+    </div>
+
+    <h2>一、Amdahl 定律</h2>
+    <p>系统性能提升受限于并行化部分的比例：</p>
+    <span class="math">Speedup = 1 / (S + (1-S)/N)</span>
+    <p>其中：</p>
+    <ul>
+        <li>S = 可并行化部分的比例</li>
+        <li>N = 处理器/核心数</li>
+    </ul>
+
+    <pre><code><span class="comment">// Amdahl 定律示例</span>
+<span class="keyword">function</span> <span class="function">calculateSpeedup</span>(serialFraction: number, cores: number): number {
+  <span class="keyword">const</span> S = serialFraction;
+  <span class="keyword">const</span> N = cores;
+  <span class="keyword">return</span> <span class="number">1</span> / (S + (<span class="number">1</span> - S) / N);
+}
+
+<span class="comment">// 50% 可并行化</span>
+console.<span class="function">log</span>(<span class="function">calculateSpeedup</span>(<span class="number">0.5</span>, <span class="number">4</span>));  <span class="comment">// 1.6x 加速</span>
+
+<span class="comment">// 90% 可并行化</span>
+console.<span class="function">log</span>(<span class="function">calculateSpeedup</span>(<span class="number">0.1</span>, <span class="number">4</span>));  <span class="comment">// 3.3x 加速</span>
+
+<span class="comment">// 10% 串行化</span>
+console.<span class="function">log</span>(<span class="function">calculateSpeedup</span>(<span class="number">0.01</span>, <span class="number">4</span>));  <span class="comment">// 3.9x 加速</span>
+
+<span class="comment">// 结论：即使无限多核，10% 串行化限制最大加速到 10x</span></code></pre>
+
+    <hr>
+
+    <h2>二、性能测量方法</h2>
+
+    <h3>2.1 基准测试</h3>
+    <pre><code><span class="comment">// 精确的基准测试</span>
+<span class="keyword">function</span> <span class="function">benchmark</span>(
+  fn: () => <span class="keyword">void</span>,
+  iterations: number = <span class="number">1000</span>
+): number {
+  <span class="comment">// 预热</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < <span class="number">10</span>; i++) fn();
+
+  <span class="comment">// 实际测量</span>
+  <span class="keyword">const</span> start = performance.<span class="function">now</span>();
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < iterations; i++) fn();
+  <span class="keyword">const</span> end = performance.<span class="function">now</span>();
+
+  <span class="keyword">return</span> (end - start) / iterations;
+}
+
+<span class="comment">// 示例：比较两种排序</span>
+<span class="keyword">const</span> arr = Array.from({ length: <span class="number">1000</span> }, () => Math.<span class="function">random</span>());
+
+<span class="keyword">const</span> quickSortTime = <span class="function">benchmark</span>(() => {
+  [...arr].<span class="function">sort</span>((a, b) => a - b);
+});
+
+<span class="keyword">const</span> bubbleSortTime = <span class="function">benchmark</span>(() => {
+  <span class="keyword">const</span> copy = [...arr];
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < copy.length; i++) {
+    <span class="keyword">for</span> (<span class="keyword">let</span> j = <span class="number">0</span>; j < copy.length - i - <span class="number">1</span>; j++) {
+      <span class="keyword">if</span> (copy[j] > copy[j + <span class="number">1</span>]) {
+        [copy[j], copy[j + <span class="number">1</span>]] = [copy[j + <span class="number">1</span>], copy[j]];
+      }
+    }
+  }
+});
+
+console.<span class="function">log</span>(<span class="string">`快速排序: ${quickSortTime.toFixed(<span class="number">3</span>)}ms`</span>);
+console.<span class="function">log</span>(<span class="string">`冒泡排序: ${bubbleSortTime.toFixed(<span class="number">3</span>)}ms`</span>);
+console.<span class="function">log</span>(<span class="string">`速度比: ${(bubbleSortTime / quickSortTime).toFixed(<span class="number">1</span>)}x`</span>);</code></pre>
+
+    <h3>2.2 Profiling 分析</h3>
+    <pre><code><span class="comment">// 使用 Node.js 内置 profiler</span>
+<span class="comment">// node --prof app.js</span>
+
+<span class="comment">// Chrome DevTools CPU Profiling</span>
+<span class="comment">// 1. 打开 DevTools</span>
+<span class="comment">// 2. Performance 标签</span>
+<span class="comment">// 3. 点击 record</span>
+<span class="comment">// 4. 执行操作</span>
+<span class="comment">// 5. 点击 stop</span>
+
+<span class="comment">// V8 プロファイラー</span>
+<span class="keyword">import</span> { <span class="function">profiler</span> } from <span class="string">'v8-profiler'</span>;
+
+profiler.<span class="function">startProfiling</span>();
+<span class="comment">// 执行要测量的代码</span>
+profiler.<span class="function">stopProfiling</span>().<span class="function">export</span>();</code></pre>
+
+    <hr>
+
+    <h2>三、热点分析</h2>
+
+    <h3>3.1 找出瓶颈</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>工具</th>
+                <th>用途</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Chrome DevTools</td>
+                <td>前端性能分析</td>
+            </tr>
+            <tr>
+                <td>Node clinic</td>
+                <td>Node.js 性能分析</td>
+            </tr>
+            <tr>
+                <td>0x</td>
+                <td>火焰图分析</td>
+            </tr>
+            <tr>
+                <td>WebPageTest</td>
+                <td>网页加载分析</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.2 火焰图分析</h3>
+    <pre><code><span class="comment">// 生成火焰图（使用 0x）</span>
+<span class="comment">// npx 0x app.js</span>
+
+<span class="comment">// 手动热点追踪</span>
+<span class="keyword">function</span> <span class="function">profileSection</span>(label: string, fn: () => <span class="keyword">void</span>): <span class="keyword">void</span> {
+  <span class="keyword">const</span> start = process.hrtime.bigint();
+  fn();
+  <span class="keyword">const</span> end = process.hrtime.bigint();
+  <span class="keyword">const</span> ms = Number(end - start) / <span class="number">1000000</span>;
+  console.<span class="function">log</span>(<span class="string">`${label}: ${ms.toFixed(<span class="number">2</span>)}ms`</span>);
+}
+
+<span class="function">profileSection</span>(<span class="string">"数据加载"</span>, () => loadData());
+<span class="function">profileSection</span>(<span class="string">"数据处理"</span>, () => processData());
+<span class="function">profileSection</span>(<span class="string">"UI 渲染"</span>, () => renderUI());</code></pre>
+
+    <hr>
+
+    <h2>四、优化策略</h2>
+
+    <h3>4.1 优化优先级</h3>
+    <pre><code><span class="comment">// 优化优先级</span>
+<span class="comment">// 1. 算法优化 - 最高回报</span>
+<span class="comment">//    O(n²) → O(n log n) 可能提升 1000 倍</span>
+
+<span class="comment">// 2. 数据结构优化 - 高回报</span>
+<span class="comment">//    数组 → 哈希表 可能提升 100 倍</span>
+
+<span class="comment">// 3. 代码优化 - 中等回报</span>
+<span class="comment">//    循环展开、减少函数调用可能提升 2-5 倍</span>
+
+<span class="comment">// 4. 编译器优化 - 低回报</span>
+<span class="comment">//    开启优化选项通常提升 10-20%</span>
+
+<span class="comment">// 示例：算法优化 vs 代码优化</span>
+<span class="comment">// ❌ 代码优化（从小处着手）</span>
+<span class="keyword">function</span> <span class="function">sum1</span>(n: number): number {
+  <span class="keyword">let</span> result = <span class="number">0</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i <= n; i++) {
+    result += i;
+  }
+  <span class="keyword">return</span> result;
+}
+
+<span class="comment">// ✅ 算法优化（从大处着眼）</span>
+<span class="keyword">function</span> <span class="function">sum2</span>(n: number): number {
+  <span class="keyword">return</span> n * (n + <span class="number">1</span>) / <span class="number">2</span>;  <span class="comment">// 数学公式</span>
+}</code></pre>
+
+    <h3>4.2 80-20 法则</h3>
+    <pre><code><span class="comment">// 80% 的时间花在 20% 的代码上</span>
+<span class="comment">// 找出热点，重点优化</span>
+
+<span class="comment">// 示例：日志系统优化</span>
+<span class="keyword">class</span> <span class="function">Logger</span> {
+  <span class="keyword">private</span> buffer: string[] = [];
+  <span class="keyword">private</span> flushInterval: number;
+
+  <span class="function">constructor</span>() {
+    <span class="keyword">this</span>.flushInterval = setInterval(() => <span class="function">this</span>.<span class="function">flush</span>(), <span class="number">1000</span>);
+  }
+
+  <span class="function">log</span>(msg: string): <span class="keyword">void</span> {
+    <span class="comment">// 批量写入，避免频繁 IO</span>
+    <span class="keyword">this</span>.buffer.<span class="function">push</span>(msg);
+  }
+
+  <span class="keyword">private</span> <span class="function">flush</span>(): <span class="keyword">void</span> {
+    <span class="keyword">if</span> (<span class="keyword">this</span>.buffer.length > <span class="number">0</span>) {
+      console.<span class="function">log</span>(<span class="string">`[${<span class="keyword">this</span>.buffer.length} 条日志]`</span>);
+      <span class="keyword">this</span>.buffer = [];
+    }
+  }
+}</code></pre>
+
+    <hr>
+
+    <h2>五、练习题</h2>
+
+    <h3>练习 6.1：性能分析</h3>
+    <p>对你项目中的一个函数进行性能分析，找出热点。</p>
+
+    <h3>练习 6.2：优化实现</h3>
+    <p>使用 Amdahl 定律计算：如果系统 95% 可并行化，在 8 核机器上最大加速比是多少？</p>
+
+    <h3>练习 6.3：基准测试</h3>
+    <p>为快速排序和归并排序编写基准测试，比较性能差异。</p>
+
+    <hr>
+
+    <h2>六、本章总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>要点</th>
+                </tr>
+                <tr>
+                    <td>Amdahl 定律</td>
+                    <td>并行化有上限，串行化部分决定加速比</td>
+                </tr>
+                <tr>
+                    <td>热点分析</td>
+                    <td>用工具找出 20% 的热点代码</td>
+                </tr>
+                <tr>
+                    <td>优化优先级</td>
+                    <td>算法 > 数据结构 > 代码 > 编译器</td>
+                </tr>
+                <tr>
+                    <td>80-20 法则</td>
+                    <td>重点优化热点代码</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

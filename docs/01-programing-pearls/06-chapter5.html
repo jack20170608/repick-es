@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5章：编程小事 - 编程珠玑</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>第5章：编程小事 - 日常编程实践</h1>
+
+    <div class="note">
+        <strong>章节类型：</strong>实践篇 - 日常编程中的小智慧
+    </div>
+
+    <h2>一、代码可读性</h2>
+
+    <h3>1.1 有意义的命名</h3>
+    <pre><code><span class="comment">// ❌ 糟糕的命名</span>
+<span class="keyword">function</span> <span class="function">c</span>(a, b) {
+  <span class="keyword">let</span> d = <span class="number">0</span>;
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < a.length; i++) {
+    d += a[i];
+  }
+  <span class="keyword">return</span> d / a.length;
+}
+
+<span class="comment">// ✅ 好的命名</span>
+<span class="keyword">function</span> <span class="function">calculateAverage</span>(numbers: number[]): number {
+  <span class="keyword">let</span> sum = <span class="number">0</span>;
+  <span class="keyword">for</span> (<span class="keyword">const</span> number of numbers) {
+    sum += number;
+  }
+  <span class="keyword">return</span> sum / numbers.length;
+}</code></pre>
+
+    <h3>1.2 函数的单一职责</h3>
+    <pre><code><span class="comment">// ❌ 一个函数做太多事</span>
+<span class="keyword">function</span> <span class="function">processUserData</span>(data) {
+  <span class="comment">// 验证、处理、存储、发送邮件...</span>
+}
+
+<span class="comment">// ✅ 单一职责</span>
+<span class="keyword">function</span> <span class="function">validateUserData</span>(data) { <span class="comment">/* 验证 */</span> }
+<span class="keyword">function</span> <span class="function">transformUserData</span>(data) { <span class="comment">/* 处理 */</span> }
+<span class="keyword">function</span> <span class="function">saveUserData</span>(data) { <span class="comment">/* 存储 */</span> }
+<span class="keyword">function</span> <span class="function">sendWelcomeEmail</span>(user) { <span class="comment">/* 邮件 */</span> }</code></pre>
+
+    <hr>
+
+    <h2>二、错误处理</h2>
+
+    <h3>2.1 防御性编程</h3>
+    <pre><code><span class="comment">// 防御性编程示例</span>
+<span class="keyword">function</span> <span class="function">divide</span>(a: number, b: number): number {
+  <span class="comment">// 检查输入</span>
+  <span class="keyword">if</span> (<span class="keyword">typeof</span> a !== <span class="string">'number'</span> || <span class="keyword">typeof</span> b !== <span class="string">'number'</span>) {
+    <span class="keyword">throw new</span> TypeError(<span class="string">"参数必须是数字"</span>);
+  }
+
+  <span class="comment">// 检查除数</span>
+  <span class="keyword">if</span> (b === <span class="number">0</span>) {
+    <span class="keyword">throw new</span> Error(<span class="string">"除数不能为0"</span>);
+  }
+
+  <span class="keyword">return</span> a / b;
+}
+
+<span class="comment">// 使用 Result 类型（更安全）</span>
+<span class="keyword">type</span> <span class="function">Result</span>&lt;T&gt; = { <span class="keyword">success</span>: <span class="keyword">true</span>; value: T } | { <span class="keyword">success</span>: <span class="keyword">false</span>; error: Error };
+
+<span class="keyword">function</span> <span class="function">safeDivide</span>(a: number, b: number): Result&lt;number&gt; {
+  <span class="keyword">if</span> (b === <span class="number">0</span>) {
+    <span class="keyword">return</span> { <span class="keyword">success</span>: <span class="keyword">false</span>, error: <span class="keyword">new</span> Error(<span class="string">"除数不能为0"</span>) };
+  }
+  <span class="keyword">return</span> { <span class="keyword">success</span>: <span class="keyword">true</span>, value: a / b };
+}</code></pre>
+
+    <h3>2.2 错误传播</h3>
+    <pre><code><span class="comment">// 错误应该被正确处理，而不是忽略</span>
+
+<span class="comment">// ❌ 错误被吞掉</span>
+<span class="keyword">try</span> {
+  <span class="function">doSomething</span>();
+} <span class="keyword">catch</span> (e) {
+  <span class="comment">// 什么都不做</span>
+}
+
+<span class="comment">// ✅ 正确处理</span>
+<span class="keyword">try</span> {
+  <span class="function">doSomething</span>();
+} <span class="keyword">catch</span> (e) {
+  console.<span class="function">error</span>(<span class="string">"操作失败:"</span>, e);
+  <span class="keyword">throw</span> e;  <span class="comment">// 或者返回错误</span>
+}
+
+<span class="comment">// 或者使用错误边界</span>
+<span class="keyword">function</span> <span class="function">handleError</span>&lt;T&gt;(fn: () => T, fallback: T): T {
+  <span class="keyword">try</span> {
+    <span class="keyword">return</span> fn();
+  } <span class="keyword">catch</span> (e) {
+    console.<span class="function">error</span>(e);
+    <span class="keyword">return</span> fallback;
+  }
+}</code></pre>
+
+    <hr>
+
+    <h2>三、代码组织</h2>
+
+    <h3>3.1 模块化</h3>
+    <pre><code><span class="comment">// 好的模块组织</span>
+<span class="comment">// utils/</span>
+<span class="comment">├── math.ts          # 数学工具</span>
+<span class="comment">├── string.ts        # 字符串工具</span>
+<span class="comment">├── array.ts         # 数组工具</span>
+<span class="comment">└── index.ts         # 导出所有工具</span>
+
+<span class="comment">// math.ts</span>
+<span class="keyword">export</span> <span class="keyword">function</span> <span class="function">average</span>(nums: number[]): number { <span class="keyword">return</span> nums.reduce((a, b) => a + b, <span class="number">0</span>) / nums.length; }
+<span class="keyword">export</span> <span class="keyword">function</span> <span class="function">sum</span>(nums: number[]): number { <span class="keyword">return</span> nums.reduce((a, b) => a + b, <span class="number">0</span>); }
+<span class="keyword">export</span> <span class="keyword">function</span> <span class="function">max</span>(nums: number[]): number { <span class="keyword">return</span> Math.max(...nums); }
+<span class="keyword">export</span> <span class="keyword">function</span> <span class="function">min</span>(nums: number[]): number { <span class="keyword">return</span> Math.min(...nums); }
+
+<span class="comment">// index.ts</span>
+<span class="keyword">export</span> * from <span class="string">'./math'</span>;
+<span class="keyword">export</span> * from <span class="string">'./string'</span>;
+<span class="keyword">export</span> * from <span class="string">'./array'</span>;</code></pre>
+
+    <h3>3.2 常量提取</h3>
+    <pre><code><span class="comment">// ❌ 硬编码</span>
+<span class="keyword">const</span> delay = <span class="number">5000</span>;
+<span class="keyword">const</span> maxRetries = <span class="number">3</span>;
+<span class="keyword">const</span> apiUrl = <span class="string">"https://api.example.com"</span>;
+
+<span class="comment">// ✅ 常量提取</span>
+<span class="comment">// config.ts</span>
+<span class="keyword">export</span> <span class="keyword">const</span> CONFIG = {
+  API: {
+    URL: <span class="string">"https://api.example.com"</span>,
+    TIMEOUT: <span class="number">5000</span>,
+    MAX_RETRIES: <span class="number">3</span>
+  },
+  PAGINATION: {
+    DEFAULT_PAGE_SIZE: <span class="number">20</span>,
+    MAX_PAGE_SIZE: <span class="number">100</span>
+  }
+} <span class="keyword">as const</span>;</code></pre>
+
+    <hr>
+
+    <h2>四、代码审查清单</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>类别</th>
+                <th>检查项</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>正确性</td>
+                <td>代码是否正确实现了需求？边界情况处理了吗？</td>
+            </tr>
+            <tr>
+                <td>可读性</td>
+                <td>变量名有意义吗？函数是否过长？</td>
+            </tr>
+            <tr>
+                <td>性能</td>
+                <td>有明显的性能问题吗？算法复杂度合理吗？</td>
+            </tr>
+            <tr>
+                <td>安全</td>
+                <td>有 SQL 注入风险吗？敏感数据处理正确吗？</td>
+            </tr>
+            <tr>
+                <td>测试</td>
+                <td>有单元测试吗？覆盖了边界情况吗？</td>
+            </tr>
+            <tr>
+                <td>文档</td>
+                <td>复杂逻辑有注释吗？公开 API 有文档吗？</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>五、练习题</h2>
+
+    <h3>练习 5.1：代码重构</h3>
+    <p>重构以下代码，使其更可读：</p>
+    <pre><code><span class="keyword">function</span> <span class="function">p</span>(d) {
+  <span class="keyword">let</span> r = [];
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < d.length; i++) {
+    <span class="keyword">if</span> (d[i].a) r.<span class="function">push</span>(d[i].b);
+  }
+  <span class="keyword">return</span> r;
+}</code></pre>
+
+    <h3>练习 5.2：错误处理</h3>
+    <p>为一个可能导致错误的函数编写完善的错误处理。</p>
+
+    <hr>
+
+    <h2>六、本章总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>原则</th>
+                    <th>实践</th>
+                </tr>
+                <tr>
+                    <td>可读性</td>
+                    <td>有意义的命名，适当的注释</td>
+                </tr>
+                <tr>
+                    <td>简洁性</td>
+                    <td>函数单一职责，避免重复</td>
+                </tr>
+                <tr>
+                    <td>健壮性</td>
+                    <td>防御性编程，正确的错误处理</td>
+                </tr>
+                <tr>
+                    <td>可维护性</td>
+                    <td>模块化，常量提取</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>
