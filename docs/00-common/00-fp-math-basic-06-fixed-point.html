@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不动点与递归 - 函数式编程数学准备</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>不动点与递归 - 理解递归的本质</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="00-fp-math-basic-04-lambda-calculus.html">Lambda 演算</a> 和 <a href="00-fp-math-basic-05-type-theory.html">类型理论</a>
+    </div>
+
+    <h2>一、为什么需要不动点？</h2>
+    <p>在 Lambda 演算中，函数没有名字，如何实现<strong>递归</strong>？</p>
+    <pre><code><span class="comment">// 问题：如何在 Lambda 演算中定义递归函数？</span>
+<span class="comment">// 例如：阶乘函数</span>
+<span class="comment">// fact n = if n == 0 then 1 else n * fact (n-1)</span>
+
+<span class="comment">// 在有名字的语言中：</span>
+<span class="keyword">function</span> <span class="function">fact</span>(n) {
+  <span class="keyword">return</span> n === <span class="number">0</span> ? <span class="number">1</span> : n * <span class="function">fact</span>(n - <span class="number">1</span>);
+}
+
+<span class="comment">// 在 Lambda 演算中，函数没有名字，怎么递归？</span>
+<span class="comment">// 答案：使用不动点组合子（Y Combinator）</span></code></pre>
+
+    <hr>
+
+    <h2>二、不动点的定义</h2>
+    <p>不动点（Fixed Point）是一个值，经过函数变换后保持不变：</p>
+    <span class="math">x 是 f 的不动点 ⇔ f(x) = x</span>
+
+    <pre><code><span class="comment">// 数学中的不动点示例</span>
+<span class="comment">// f(x) = x²</span>
+<span class="comment">// 不动点：x = 0, x = 1</span>
+<span class="comment">// 因为 0² = 0, 1² = 1</span>
+
+<span class="comment">// g(x) = x + 1</span>
+<span class="comment">// 不动点：不存在（除了无穷远处）</span>
+
+<span class="comment">// h(x) = 2x / 3</span>
+<span class="comment">// 不动点：x = 0</span>
+<span class="comment">// 因为 2*0/3 = 0</span></code></pre>
+
+    <h3>不动点定理</h3>
+    <p>对于连续函数 f: [a, b] → [a, b]，必有一个不动点（巴拿赫不动点定理的简化版本）。</p>
+
+    <hr>
+
+    <h2>三、Y 组合子</h2>
+    <p>Y 组合子（Y Combinator）是一个用于<strong>在 Lambda 演算中实现递归</strong>的组合子。</p>
+
+    <h3>3.1 定义</h3>
+    <span class="math">Y = λf. (λx. f (x x)) (λx. f (x x))</span>
+
+    <pre><code><span class="comment">// Y 组合子的类型</span>
+<span class="comment">// Y :: (a -> a) -> a</span>
+
+<span class="comment">// Y 的作用</span>
+<span class="comment">// Y F = F (Y F)</span>
+<span class="comment">// 即：Y f 是 f 的不动点</span>
+<span class="comment">// f (Y f) = Y f</span></code></pre>
+
+    <h3>3.2 为什么 Y 能实现递归？</h3>
+    <pre><code><span class="comment">// 让我们推导：Y F = F (Y F)</span>
+
+<span class="comment">// 展开 Y 的定义</span>
+Y F
+= (λf. (λx. f (x x)) (λx. f (x x))) F
+= (λx. F (x x)) (λx. F (x x))          <span class="comment">// Beta 归约</span>
+= F ((λx. F (x x)) (λx. F (x x)))      <span class="comment">// 再次 Beta 归约</span>
+= F (Y F)                               <span class="comment">// 替换回去</span>
+
+<span class="comment">// 验证：令 fact = Y F</span>
+fact
+= Y F
+= F (Y F)
+= F (fact)                              <span class="comment">// 递归调用！</span></code></pre>
+
+    <h3>3.3 编程实现 Y</h3>
+    <pre><code><span class="comment">// JavaScript 实现 Y 组合子</span>
+<span class="keyword">const</span> Y = (f: (fn: (x: <span class="keyword">any</span>) => <span class="keyword">any</span>) => (x: <span class="keyword">any</span>) => <span class="keyword">any</span>) => {
+  <span class="keyword">return</span> (<span class="keyword">const</span> x: <span class="keyword">any</span>) => f(x(x))(
+         (<span class="keyword">const</span> x: <span class="keyword">any</span>) => f(x(x))
+       );
+};
+
+<span class="comment">// 使用 Y 定义阶乘</span>
+<span class="keyword">const</span> factGen = (fact: (n: number) => number) => {
+  <span class="keyword">return</span> (n: number): number =>
+    n === <span class="number">0</span> ? <span class="number">1</span> : n * fact(n - <span class="number">1</span>);
+};
+
+<span class="keyword">const</span> fact = Y(factGen);
+
+console.<span class="function">log</span>(fact(<span class="number">5</span>));  <span class="comment">// 120</span></code></pre>
+
+    <hr>
+
+    <h2>四、Z 组合子（严格版本）</h2>
+    <p>Y 组合子在非严格求值语言（如 Haskell）中工作正常，但在严格求值语言（如 JavaScript）中会无限递归。Z 组合子解决了这个问题：</p>
+    <span class="math">Z = λf. (λx. f (λy. x x y)) (λx. f (λy. x x y))</span>
+
+    <pre><code><span class="comment">// Z 组合子：严格求值环境中的递归</span>
+<span class="keyword">const</span> Z = (f: (fn: (x: <span class="keyword">any</span>) => <span class="keyword">any</span>) => (x: <span class="keyword">any</span>) => <span class="keyword">any</span>) => {
+  <span class="keyword">return</span> (<span class="keyword">const</span> x: <span class="keyword">any</span>) => f((y: <span class="keyword">any</span>) => x(x)(y))(
+         (<span class="keyword">const</span> x: <span class="keyword">any</span>) => f((y: <span class="keyword">any</span>) => x(x)(y))
+       );
+};
+
+<span class="comment">// 使用 Z 定义阶乘</span>
+<span class="keyword">const</span> factGen = (fact: (n: number) => number) => {
+  <span class="keyword">return</span> (n: number): number => {
+    console.<span class="function">log</span>(<span class="string">"computing fact("</span> + n + <span class="string">")"</span>);
+    <span class="keyword">return</span> n === <span class="number">0</span> ? <span class="number">1</span> : n * fact(n - <span class="number">1</span>);
+  };
+};
+
+<span class="keyword">const</span> fact = Z(factGen);
+
+console.<span class="function">log</span>(fact(<span class="number">5</span>));
+<span class="comment">// 正常工作，不会无限递归</span></code></pre>
+
+    <hr>
+
+    <h2>五、递归与不动点</h2>
+    <p>递归的本质是求解<strong>函数方程</strong>：</p>
+    <span class="math">fact = F(fact)</span>
+    <p>其中 F 是一个函数生成器（接受一个递归函数，返回一个新的递归函数）。</p>
+
+    <pre><code><span class="comment">// 递归方程</span>
+<span class="comment">// fact = λn. if n==0 then 1 else n * fact(n-1)</span>
+
+<span class="comment">// 重写为不动点形式</span>
+<span class="comment">// fact = F(fact)</span>
+<span class="comment">// 其中 F = λf. λn. if n==0 then 1 else n * f(n-1)</span>
+
+<span class="comment">// fact 是 F 的不动点</span>
+<span class="comment">// fact = Y F</span>
+
+<span class="comment">// 斐波那契数列</span>
+<span class="comment">// fib = λn. if n<=1 then n else fib(n-1) + fib(n-2)</span>
+<span class="comment">// fib = F(fib)</span>
+<span class="comment">// fib = Y F</span>
+
+<span class="keyword">const</span> fibGen = (fib: (n: number) => number) => {
+  <span class="keyword">return</span> (n: number): number =>
+    n <= <span class="number">1</span> ? n : fib(n - <span class="number">1</span>) + fib(n - <span class="number">2</span>);
+};
+
+<span class="keyword">const</span> fib = Y(fibGen);
+console.<span class="function">log</span>(fib(<span class="number">10</span>));  <span class="comment">// 55</span></code></pre>
+
+    <hr>
+
+    <h2>六、尾递归优化</h2>
+    <p>递归可能导致栈溢出。尾递归优化（TCO）将递归转换为迭代。</p>
+
+    <h3>6.1 普通递归 vs 尾递归</h3>
+    <pre><code><span class="comment">// 普通递归：计算结果需要等待递归返回</span>
+<span class="keyword">function</span> <span class="function">fact</span>(n) {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> <span class="number">1</span>;
+  <span class="keyword">return</span> n * <span class="function">fact</span>(n - <span class="number">1</span>);  <span class="comment">// 需要保存 n，等待递归返回</span>
+}
+
+<span class="comment">// 尾递归：递归调用是最后一步操作</span>
+<span class="keyword">function</span> <span class="function">factTail</span>(n, acc = <span class="number">1</span>) {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> acc;
+  <span class="keyword">return</span> <span class="function">factTail</span>(n - <span class="number">1</span>, n * acc);  <span class="comment">// 最后一步，直接返回</span>
+}</code></pre>
+
+    <h3>6.2 为什么尾递归可以优化？</h3>
+    <pre><code><span class="comment">// 普通递归的调用栈</span>
+<span class="comment">// fact(5)</span>
+<span class="comment">// 5 * fact(4)</span>
+<span class="comment">// 5 * (4 * fact(3))</span>
+<span class="comment">// 5 * (4 * (3 * fact(2)))</span>
+<span class="comment">// 5 * (4 * (3 * (2 * fact(1))))</span>
+<span class="comment">// 5 * (4 * (3 * (2 * 1)))</span>
+<span class="comment">// 120</span>
+<span class="comment">// 栈深度：O(n)</span>
+
+<span class="comment">// 尾递归的调用栈</span>
+<span class="comment">// factTail(5, 1)</span>
+<span class="comment">// factTail(4, 5)</span>
+<span class="comment">// factTail(3, 20)</span>
+<span class="comment">// factTail(2, 60)</span>
+<span class="comment">// factTail(1, 120)</span>
+<span class="comment">// factTail(0, 120)</span>
+<span class="comment">// 120</span>
+<span class="comment">// 栈深度：O(1)，可以优化为循环</span></code></pre>
+
+    <h3>6.3 在 FP 中实现尾递归</h3>
+    <pre><code><span class="comment">// Haskell：天生的尾递归优化</span>
+<span class="comment">-- fact n = go n 1</span>
+<span class="comment">--   where</span>
+<span class="comment">--     go 0 acc = acc</span>
+<span class="comment">--     go n acc = go (n-1) (n * acc)</span>
+
+<span class="comment">// JavaScript：使用 Trampoline 手动优化</span>
+<span class="keyword">const</span> <span class="function"> trampoline </span>= (fn: () => <span class="keyword">any</span>): <span class="keyword">any</span> => {
+  <span class="keyword">let</span> result = fn();
+  <span class="keyword">while</span> (<span class="keyword">typeof</span> result === <span class="string">'function'</span>) {
+    result = result();
+  }
+  <span class="keyword">return</span> result;
+};
+
+<span class="keyword">const</span> <span class="function">factTail</span> = (n: number, acc: number = <span class="number">1</span>): (() => <span class="keyword">any</span>) | number => {
+  <span class="keyword">if</span> (n === <span class="number">0</span>) <span class="keyword">return</span> acc;
+  <span class="keyword">return</span> () => <span class="function">factTail</span>(n - <span class="number">1</span>, n * acc);
+};
+
+<span class="keyword">const</span> result = <span class="function"> trampoline </span>(() => <span class="function">factTail</span>(<span class="number">100000</span>));
+console.<span class="function">log</span>(result);  <span class="comment">// 不会栈溢出！</span></code></pre>
+
+    <hr>
+
+    <h2>七、递归与数学归纳法</h2>
+    <p>递归和数学归纳法本质上是相同的：</p>
+    <table>
+        <thead>
+            <tr>
+                <th>数学归纳法</th>
+                <th>递归函数</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>基例：P(0) 为真</td>
+                <td>递归终止条件</td>
+            </tr>
+            <tr>
+                <td>归纳假设：假设 P(k) 为真</td>
+                <td>递归调用假设</td>
+            </tr>
+            <tr>
+                <td>归纳步骤：证明 P(k+1)</td>
+                <td>递归调用返回</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="comment">// 数学归纳法证明：1 + 2 + ... + n = n(n+1)/2</span>
+<span class="comment">// 基例：n = 1, 1 = 1*2/2 = 1 ✓</span>
+<span class="comment">// 归纳假设：假设 1+2+...+k = k(k+1)/2</span>
+<span class="comment">// 归纳步骤：1+2+...+(k+1) = (1+...+k) + (k+1)</span>
+<span class="comment">//                     = k(k+1)/2 + (k+1)</span>
+<span class="comment">//                     = (k+1)(k/2 + 1)</span>
+<span class="comment">//                     = (k+1)(k+2)/2</span>
+<span class="comment">//                     = (k+1)((k+1)+1)/2 ✓</span>
+
+<span class="comment">// 对应的递归函数</span>
+<span class="keyword">const</span> <span class="function">sum</span> = (n: number): number =>
+  n === <span class="number">0</span> ? <span class="number">0</span> : n + <span class="function">sum</span>(n - <span class="number">1</span>);
+
+<span class="comment">// sum(n) = n(n+1)/2</span></code></pre>
+
+    <hr>
+
+    <h2>八、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>不动点</td>
+                    <td>f(x) = x 的解</td>
+                </tr>
+                <tr>
+                    <td>Y 组合子</td>
+                    <td>λ 演算中的递归实现</td>
+                </tr>
+                <tr>
+                    <td>Z 组合子</td>
+                    <td>严格求值环境中的 Y</td>
+                </tr>
+                <tr>
+                    <td>尾递归</td>
+                    <td>可优化为迭代的递归</td>
+                </tr>
+                <tr>
+                    <td>TCO</td>
+                    <td>尾递归优化</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>理解不动点和递归的本质，是掌握 FP 思维的关键。下一章我们将学习<strong>范畴论</strong>，这是理解 Functor、Monad 等概念的数学基础。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Fixed-point_combinator" target="_blank">Fixed-Point Combinator - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Y_combinator" target="_blank">Y Combinator - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

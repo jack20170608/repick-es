@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数基础 - 函数式编程数学准备</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>函数基础 - 从数学到编程</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="00-fp-math-basic-01-sets.html">集合论基础</a>
+    </div>
+
+    <h2>一、函数的形式化定义</h2>
+    <p>在数学中，函数是集合之间的一种特殊关系：</p>
+    <span class="math">f: A → B</span>
+    <p>这表示 f 是一个从集合 A（定义域）到集合 B（值域）的函数。</p>
+
+    <h3>函数的三个要素</h3>
+    <ol>
+        <li><strong>定义域（Domain）</strong>：输入的集合 A</li>
+        <li><strong>值域（Codomain）</strong>：输出的集合 B</li>
+        <li><strong>对应规则（Rule）</strong>：每个 A 中的元素如何对应到 B 中的元素</li>
+    </ol>
+
+    <pre><code><span class="comment">// 数学函数：f(x) = x²</span>
+<span class="comment">// f: ℕ → ℕ</span>
+f(x) = x * x
+
+<span class="comment">// 在编程中</span>
+<span class="keyword">const</span> <span class="function">f</span> = (x: number): number => x * x;
+<span class="comment">// 类型: (number) => number</span></code></pre>
+
+    <hr>
+
+    <h2>二、函数的分类</h2>
+
+    <h3>2.1 单射（Injective / One-to-One）</h3>
+    <p>不同的输入产生不同的输出：</p>
+    <span class="math">∀x₁, x₂ ∈ A, x₁ ≠ x₂ ⇒ f(x₁) ≠ f(x₂)</span>
+
+    <pre><code><span class="comment">// 单射示例：f(x) = 2x + 1</span>
+<span class="comment">// 1 → 3, 2 → 5, 3 → 7, ...</span>
+<span class="comment">// 不同的输入永远不会得到相同的输出</span>
+
+<span class="keyword">const</span> <span class="function">isInjective</span> = (f: (x: number) => number): boolean => {
+  <span class="comment">// 测试实现...</span>
+};
+
+<span class="comment">// 非单射示例：f(x) = x²</span>
+<span class="comment">// f(2) = 4, f(-2) = 4  // 不同的输入产生相同输出</span></code></pre>
+
+    <h3>2.2 满射（Surjective / Onto）</h3>
+    <p>值域中的每个元素都有对应的输入：</p>
+    <span class="math">∀y ∈ B, ∃x ∈ A 使得 f(x) = y</span>
+
+    <pre><code><span class="comment">// 满射示例：f(x) = x + 1</span>
+<span class="comment">// f: ℕ → ℕ₊ (自然数到正自然数)</span>
+<span class="comment">// 每个正自然数都有对应的前驱</span>
+
+<span class="comment">// 非满射示例：f(x) = x²</span>
+<span class="comment">// f: ℕ → ℕ</span>
+<span class="comment">// 2, 3, 5, 6, ... 没有对应的自然数平方根</span></code></pre>
+
+    <h3>2.3 双射（Bijective）</h3>
+    <p>既是单射又是满射，即「一一对应」：</p>
+    <span class="math">双射 ⇔ 单射 ∧ 满射</span>
+    <p>双射函数是可逆的，存在逆函数 f⁻¹。</p>
+
+    <pre><code><span class="comment">// 双射示例：f(x) = x + 1</span>
+<span class="comment">// f: ℕ → ℕ₊ 是双射</span>
+<span class="comment">// 逆函数：f⁻¹(y) = y - 1</span>
+
+<span class="keyword">const</span> <span class="function">add1</span> = (x: number): number => x + 1;
+<span class="keyword">const</span> <span class="function">sub1</span> = (x: number): number => x - 1;
+
+<span class="comment">// 验证：f⁻¹(f(x)) = x</span>
+<span class="comment">// sub1(add1(x)) = sub1(x + 1) = x</span></code></pre>
+
+    <hr>
+
+    <h2>三、函数复合</h2>
+    <p>函数复合是 FP 的核心操作：</p>
+    <span class="math">(g ∘ f)(x) = g(f(x))</span>
+    <p>先执行 f，再执行 g。</p>
+
+    <pre><code><span class="comment">// 数学表示：g ∘ f</span>
+<span class="comment">// f: A → B</span>
+<span class="comment">// g: B → C</span>
+<span class="comment">// g ∘ f: A → C</span>
+
+<span class="comment">// 编程实现</span>
+<span class="keyword">const</span> <span class="function">compose</span> = &lt;A, B, C&gt;(g: (b: B) => C, f: (a: A) => B) =>
+  (a: A): C => g(f(a));
+
+<span class="comment">// 示例</span>
+<span class="keyword">const</span> <span class="function">add1</span> = (x: number) => x + 1;
+<span class="keyword">const</span> <span class="function">double</span> = (x: number) => x * 2;
+<span class="keyword">const</span> <span class="function">add1ThenDouble</span> = <span class="function">compose</span>(double, add1);
+
+console.<span class="function">log</span>(<span class="function">add1ThenDouble</span>(<span class="number">3</span>));  <span class="comment">// (3 + 1) * 2 = 8</span></code></pre>
+
+    <h3>结合律</h3>
+    <p>函数复合满足结合律：</p>
+    <span class="math">h ∘ (g ∘ f) = (h ∘ g) ∘ f</span>
+
+    <pre><code><span class="comment">// 结合律示例</span>
+<span class="keyword">const</span> <span class="function">f</span> = (x: number) => x + 1;
+<span class="keyword">const</span> <span class="function">g</span> = (x: number) => x * 2;
+<span class="keyword">const</span> <span class="function">h</span> = (x: number) => x - 3;
+
+<span class="comment">// h ∘ (g ∘ f)</span>
+<span class="keyword">const</span> left = <span class="function">compose</span>(h, <span class="function">compose</span>(g, f));
+
+<span class="comment">// (h ∘ g) ∘ f</span>
+<span class="keyword">const</span> right = <span class="function">compose</span>(<span class="function">compose</span>(h, g), f);
+
+<span class="comment">// 结果相同：left(x) === right(x)</span></code></pre>
+
+    <hr>
+
+    <h2>四、恒等函数与常数函数</h2>
+
+    <h3>4.1 恒等函数（Identity Function）</h3>
+    <span class="math">id_A: A → A, id_A(x) = x</span>
+
+    <pre><code><span class="comment">// 恒等函数</span>
+<span class="keyword">const</span> <span class="function">identity</span> = &lt;T&gt;(x: T): T => x;
+
+console.<span class="function">log</span>(<span class="function">identity</span>(<span class="number">5</span>));        <span class="comment">// 5</span>
+console.<span class="function">log</span>(<span class="function">identity</span>(<span class="string">"hello"</span>));  <span class="comment">// "hello"</span>
+console.<span class="function">log</span>(<span class="function">identity</span>({a: <span class="number">1</span>}));   <span class="comment">// {a: 1}</span>
+
+<span class="comment">// 恒等函数的性质</span>
+<span class="comment">// compose(f, id) = f</span>
+<span class="comment">// compose(id, f) = f</span></code></pre>
+
+    <h3>4.2 常数函数（Constant Function）</h3>
+    <span class="math">const_k: A → B, const_k(x) = k</span>
+    <p>无论输入是什么，都返回同一个常数。</p>
+
+    <pre><code><span class="comment">// 常数函数</span>
+<span class="keyword">const</span> <span class="function">constant</span> = &lt;T, K&gt;(k: K) => (x: T): K => k;
+
+<span class="keyword">const</span> <span class="function">always5</span> = <span class="function">constant</span>(<span class="number">5</span>);
+console.<span class="function">log</span>(<span class="function">always5</span>(<span class="number">1</span>));  <span class="comment">// 5</span>
+console.<span class="function">log</span>(<span class="function">always5</span>(<span class="number">100</span>)); <span class="comment">// 5</span>
+console.<span class="function">log</span>(<span class="function">always5</span>(<span class="string">"x"</span>)); <span class="comment">// 5</span></code></pre>
+
+    <hr>
+
+    <h2>五、偏函数与全函数</h2>
+
+    <h3>5.1 全函数（Total Function）</h3>
+    <p>定义域中的每个元素都有对应的输出：</p>
+    <pre><code><span class="comment">// 全函数：所有输入都有定义</span>
+<span class="keyword">const</span> <span class="function">add</span> = (a: number, b: number): number => a + b;
+<span class="comment">// add(1, 2) = 3</span>
+<span class="comment">// add(0, 0) = 0</span>
+<span class="comment">// 任何两个数字相加都有定义</span></code></pre>
+
+    <h3>5.2 偏函数（Partial Function）</h3>
+    <p>只有部分输入有定义：</p>
+    <pre><code><span class="comment">// 偏函数：某些输入没有定义</span>
+<span class="keyword">const</span> <span class="function">divide</span> = (a: number, b: number): number => {
+  <span class="keyword">if</span> (b === <span class="number">0</span>) {
+    <span class="keyword">throw new</span> Error(<span class="string">"Cannot divide by zero"</span>);
+  }
+  <span class="keyword">return</span> a / b;
+};
+<span class="comment">// divide(10, 2) = 5</span>
+<span class="comment">// divide(10, 0) // 抛出错误！</span>
+
+<span class="comment">// 在 FP 中，偏函数通常用 Maybe 表示</span>
+<span class="keyword">const</span> <span class="function">safeDivide</span> = (a: number, b: number): number | null =>
+  b === <span class="number">0</span> ? null : a / b;</code></pre>
+
+    <hr>
+
+    <h2>六、闭包与高阶函数</h2>
+
+    <h3>6.1 闭包（Closure）</h3>
+    <p>闭包是绑定了自由变量的函数：</p>
+    <pre><code><span class="comment">// 闭包：函数携带了创建时的环境</span>
+<span class="keyword">const</span> <span class="function">createAdder</span> = (n: number): (x: number) => number => {
+  <span class="keyword">return</span> (x: number): number => x + n;
+};
+
+<span class="keyword">const</span> add5 = <span class="function">createAdder</span>(<span class="number">5</span>);
+<span class="keyword">const</span> add10 = <span class="function">createAdder</span>(<span class="number">10</span>);
+
+console.<span class="function">log</span>(add5(<span class="number">3</span>));   <span class="comment">// 8</span>
+console.<span class="function">log</span>(add10(<span class="number">3</span>));  <span class="comment">// 13</span></code></pre>
+
+    <h3>6.2 高阶函数（Higher-Order Function）</h3>
+    <p>接受函数作为输入或输出的函数：</p>
+    <pre><code><span class="comment">// 高阶函数示例</span>
+
+<span class="comment">// 接受函数作为参数</span>
+<span class="keyword">const</span> <span class="function">map</span> = &lt;T, U&gt;(fn: (t: T) => U, arr: T[]): U[] =>
+  arr.<span class="function">map</span>(fn);
+
+<span class="comment">// 接受函数作为参数</span>
+<span class="keyword">const</span> <span class="function">filter</span> = &lt;T&gt;(pred: (t: T) => boolean, arr: T[]): T[] =>
+  arr.<span class="function">filter</span>(pred);
+
+<span class="comment">// 返回函数</span>
+<span class="keyword">const</span> <span class="function">curry</span> = &lt;T, U, V&gt;(fn: (a: T, b: U) => V) =>
+  (a: T) => (b: U): V => fn(a, b);</code></pre>
+
+    <hr>
+
+    <h2>七、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>数学符号</th>
+                    <th>编程对应</th>
+                </tr>
+                <tr>
+                    <td>函数</td>
+                    <td>f: A → B</td>
+                    <td>(a: A) => B</td>
+                </tr>
+                <tr>
+                    <td>单射</td>
+                    <td>不同的x，不同的f(x)</td>
+                    <td>Map 结构</td>
+                </tr>
+                <tr>
+                    <td>满射</td>
+                    <td>每个y都有对应的x</td>
+                    <td>覆盖所有情况</td>
+                </tr>
+                <tr>
+                    <td>双射</td>
+                    <td>单射 + 满射</td>
+                    <td>可逆函数</td>
+                </tr>
+                <tr>
+                    <td>复合</td>
+                    <td>g ∘ f</td>
+                    <td>compose(g, f)</td>
+                </tr>
+                <tr>
+                    <td>恒等</td>
+                    <td>id(x) = x</td>
+                    <td>identity(x)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>理解函数的基本性质是掌握函数式编程的关键。下一章我们将学习<strong>逻辑基础</strong>，这是理解类型系统和条件计算的前提。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Function_(mathematics)" target="_blank">Function (Mathematics) - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Injective_function" target="_blank">Injective Function - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

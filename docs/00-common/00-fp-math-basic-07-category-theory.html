@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>范畴论入门 - 函数式编程的数学框架</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>范畴论入门 - 函数式编程的数学框架</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="00-fp-math-basic-01-sets.html">集合论基础</a>、<a href="00-fp-math-basic-04-lambda-calculus.html">Lambda 演算</a>、<a href="00-fp-math-basic-05-type-theory.html">类型理论</a>
+    </div>
+
+    <h2>一、为什么学范畴论？</h2>
+    <p>范畴论是 FP 的「元语言」：</p>
+    <ul>
+        <li><strong>Functor</strong>、<strong>Applicative</strong>、<strong>Monad</strong> 都来自范畴论</li>
+        <li>理解它们为什么这样设计，而不是死记硬背</li>
+        <li>学习抽象思考的方式</li>
+    </ul>
+
+    <hr>
+
+    <h2>二、范畴的定义</h2>
+    <p>范畴（Category）由两部分组成：</p>
+    <ol>
+        <li><strong>对象（Objects）</strong>：一组「东西」</li>
+        <li><strong>态射（Morphisms）</strong>：对象之间的「箭头」</li>
+    </ol>
+
+    <h3>范畴的三条公理</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>公理</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>恒等态射</td>
+                <td>每个对象都有 id: A → A</td>
+            </tr>
+            <tr>
+                <td>结合律</td>
+                <td>(f ∘ g) ∘ h = f ∘ (g ∘ h)</td>
+            </tr>
+            <tr>
+                <td>闭合性</td>
+                <td>若 f: A → B, g: B → C，则 g ∘ f: A → C</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="comment">// 范畴示例：Set（集合范畴）</span>
+<span class="comment">// 对象：所有集合</span>
+<span class="comment">// 态射：所有函数</span>
+
+<span class="comment">// 范畴示例：Type（类型范畴）</span>
+<span class="comment">// 对象：所有类型（如 number, string, []）</span>
+<span class="comment">// 态射：所有函数（如 (x: number) => string）</span>
+
+<span class="comment">// 范畴示例：Hask（Haskell 类型范畴）</span>
+<span class="comment">// 对象：Haskell 类型</span>
+<span class="comment">// 态射：Haskell 函数</span></code></pre>
+
+    <hr>
+
+    <h2>三、函子（Functor）</h2>
+    <p>函子（Functor）是范畴之间的「保持结构的映射」。</p>
+
+    <h3>3.1 定义</h3>
+    <p>函子 F: C → D 包含：</p>
+    <ol>
+        <li><strong>对象映射</strong>：对 C 中的每个对象 A，映射到 D 中的对象 F(A)</li>
+        <li><strong>态射映射</strong>：对 C 中的每个态射 f: A → B，映射到 D 中的态射 F(f): F(A) → F(B)</li>
+    </ol>
+
+    <h3>3.2 函子公理</h3>
+    <pre><code><span class="comment">// 1. 保持恒等态射</span>
+<span class="comment">// F(id_A) = id_F(A)</span>
+
+<span class="comment">// 2. 保持复合</span>
+<span class="comment">// F(f ∘ g) = F(f) ∘ F(g)</span></code></pre>
+
+    <h3>3.3 编程中的 Functor</h3>
+    <pre><code><span class="comment">// JavaScript: Array 是 Functor</span>
+<span class="comment">// map :: (a -> b) -> [a] -> [b]</span>
+[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="function">map</span>(x => x * <span class="number">2</span>)  <span class="comment">// [2, 4, 6]</span>
+
+<span class="comment">// TypeScript: 包装类型</span>
+<span class="keyword">class</span> <span class="function">Box</span>&lt;A&gt; {
+  <span class="keyword">constructor</span>(<span class="keyword">private</span> value: A) {}
+
+  <span class="function">map</span>&lt;B&gt;(fn: (a: A) => B): Box&lt;B&gt; {
+    <span class="keyword">return new</span> Box(fn(<span class="keyword">this</span>.value));
+  }
+}
+
+<span class="keyword">const</span> box = <span class="keyword">new</span> Box(<span class="number">5</span>);
+box.<span class="function">map</span>(x => x * <span class="number">2</span>)  <span class="comment">// Box(10)</span>
+box.<span class="function">map</span>(x => x.toString())  <span class="comment">// Box("5")</span>
+
+<span class="comment">// Maybe Functor</span>
+<span class="keyword">type</span> <span class="function">Maybe</span>&lt;A&gt; = A | null;
+
+<span class="keyword">const</span> <span class="function">mapMaybe</span> = &lt;A, B&gt;(fn: (a: A) => B, ma: Maybe&lt;A&gt;): Maybe&lt;B&gt; =>
+  ma === null ? null : fn(ma);
+
+<span class="function">mapMaybe</span>(x => x * <span class="number">2</span>, <span class="number">5</span>)   <span class="comment">// 10</span>
+<span class="function">mapMaybe</span>(x => x * <span class="number">2</span>, null)  <span class="comment">// null</span></code></pre>
+
+    <hr>
+
+    <h2>四、应用函子（Applicative）</h2>
+    <p>Applicative 是「带参数函数」的 Functor。</p>
+
+    <h3>4.1 动机</h3>
+    <pre><code><span class="comment">// Functor 可以处理：fn :: a -> b, fa :: F a</code></pre>
+    <pre><code><span class="comment">// 但如果 fn 也在上下文中呢？</span>
+<span class="comment">// fn :: F (a -> b), fa :: F a</span>
+
+<span class="comment">// Functor 解决不了这个问题！</span>
+<span class="comment">// 需要 Applicative</span></code></pre>
+
+    <h3>4.2 定义</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>方法</th>
+                <th>类型</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>pure</td>
+                <td>a → F a</td>
+                <td>把值放入上下文</td>
+            </tr>
+            <tr>
+                <td>ap</td>
+                <td>F (a → b) → (F a) → F b</td>
+                <td>应用上下文中 的函数</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>4.3 编程中的 Applicative</h3>
+    <pre><code><span class="comment">// JavaScript: 实现 Applicative Box</span>
+<span class="keyword">class</span> <span class="function">Box</span>&lt;A&gt; {
+  <span class="keyword">constructor</span>(<span class="keyword">private</span> value: A) {}
+
+  <span class="function">map</span>&lt;B&gt;(fn: (a: A) => B): Box&lt;B&gt; {
+    <span class="keyword">return new</span> Box(fn(<span class="keyword">this</span>.value));
+  }
+
+  <span class="comment">// Applicative 方法</span>
+  <span class="function">ap</span>&lt;B&gt;(fab: Box<(a: A) => B>): Box&lt;B&gt; {
+    <span class="keyword">return</span> fab.<span class="function">map</span>(fn => fn(<span class="keyword">this</span>.value));
+  }
+
+  <span class="keyword">static</span> <span class="function">pure</span>&lt;A&gt;(a: A): Box&lt;A&gt; {
+    <span class="keyword">return new</span> Box(a);
+  }
+}
+
+<span class="comment">// 使用</span>
+<span class="keyword">const</span> add = (a: number) => (b: number): number => a + b;
+Box.<span class="function">pure</span>(add).<span class="function">ap</span>(Box.<span class="function">pure</span>(<span class="number">5</span>)).<span class="function">ap</span>(Box.<span class="function">pure</span>(<span class="number">3</span>))
+<span class="comment">// Box(8)</span></code></pre>
+
+    <hr>
+
+    <h2>五、单子（Monad）</h2>
+    <p>Monad 是「扁平化」的 Monoidal Functor。</p>
+
+    <h3>5.1 动机：处理嵌套上下文</h3>
+    <pre><code><span class="comment">// Functor: F a -> F b</span>
+<span class="comment">// Applicative: F (a -> b) -> F a -> F b</span>
+
+<span class="comment">// 但如果有 F (F a) 呢？</span>
+<span class="comment">// 嵌套的数组？ Promise<Promise<a>>？</span>
+
+<span class="comment">// 需要 flatten/join</span></code></pre>
+
+    <h3>5.2 定义</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>方法</th>
+                <th>类型</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>of / pure</td>
+                <td>a → M a</td>
+                <td>把值放入 Monad</td>
+            </tr>
+            <tr>
+                <td>flatMap / bind</td>
+                <td>M a → (a → M b) → M b</td>
+                <td>链式操作，平滑嵌套</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>5.3 编程中的 Monad</h3>
+    <pre><code><span class="comment">// JavaScript: Promise 是 Monad</span>
+<span class="comment">// Promise.resolve(a) = pure</span>
+<span class="comment">// Promise.then(fn) = flatMap</span>
+
+Promise.<span class="function">resolve</span>(<span class="number">5</span>)
+  .<span class="function">then</span>(x => x * <span class="number">2</span>)
+  .<span class="function">then</span>(x => Promise.<span class="function">resolve</span>(x + <span class="number">1</span>))
+  .<span class="function">then</span>(console.<span class="function">log</span>);  <span class="comment">// 11</span>
+
+<span class="comment">// Array 也是 Monad</span>
+[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]
+  .<span class="function">flatMap</span>(x => [x, x * <span class="number">10</span>])
+  <span class="comment">// [1, 10, 2, 20, 3, 30]</span>
+
+<span class="comment">// Maybe Monad</span>
+<span class="keyword">type</span> <span class="function">Maybe</span>&lt;A&gt; = A | null;
+
+<span class="keyword">const</span> <span class="function">pure</span> = &lt;A&gt;(a: A): Maybe&lt;A&gt; => a;
+<span class="keyword">const</span> <span class="function">flatMap</span> = &lt;A, B&gt;(ma: Maybe&lt;A&gt;, fn: (a: A) => Maybe&lt;B&gt;): Maybe&lt;B&gt; =>
+  ma === null ? null : fn(ma);
+
+<span class="comment">// 链式操作</span>
+<span class="function">flatMap</span>(
+  <span class="function">flatMap</span>(
+    <span class="function">pure</span>(<span class="number">5</span>),
+    x => x > <span class="number">0</span> ? x : null  <span class="comment">// 过滤负数</span>
+  ),
+  x => x * <span class="number">2</span> > <span class="number">0</span> ? x * <span class="number">2</span> : null
+)  <span class="comment">// 10</span></code></pre>
+
+    <h3>5.4 Monad 定律</h3>
+    <pre><code><span class="comment">// 1. 左单位律</span>
+<span class="comment">// pure(a).flatMap(f) ≡ f(a)</span>
+
+<span class="comment">// 2. 右单位律</span>
+<span class="comment">// m.flatMap(pure) ≡ m</span>
+
+<span class="comment">// 3. 结合律</span>
+<span class="comment">// m.flatMap(f).flatMap(g) ≡ m.flatMap(x => f(x).flatMap(g))</span></code></pre>
+
+    <hr>
+
+    <h2>六、范畴论与 FP 的对应</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>范畴论</th>
+                <th>FP 概念</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>范畴</td>
+                <td>Type / Set</td>
+                <td>类型系统</td>
+            </tr>
+            <tr>
+                <td>对象</td>
+                <td>类型</td>
+                <td>如 number, string</td>
+            </tr>
+            <tr>
+                <td>态射</td>
+                <td>函数</td>
+                <td>a → b</td>
+            </tr>
+            <tr>
+                <td>函子</td>
+                <td>Functor</td>
+                <td>map, fmap</td>
+            </tr>
+            <tr>
+                <td>应用函子</td>
+                <td>Applicative</td>
+                <td>ap, pure</td>
+            </tr>
+            <tr>
+                <td>单子</td>
+                <td>Monad</td>
+                <td>flatMap, bind</td>
+            </tr>
+            <tr>
+                <td>自然变换</td>
+                <td>类型转换函数</td>
+                <td>Maybe → Either</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>七、实战：整合所有概念</h2>
+    <pre><code><span class="comment">// 完整的函子层级</span>
+
+<span class="comment">// Functor: 可以 map</span>
+<span class="comment">// fmap :: (a -> b) -> F a -> F b</span>
+
+<span class="comment">// Applicative: 可以 ap + of</span>
+<span class="comment">// ap :: F (a -> b) -> F a -> F b</span>
+<span class="comment">// of :: a -> F a</span>
+
+<span class="comment">// Monad: 可以 flatMap + of</span>
+<span class="comment">// flatMap :: F a -> (a -> F b) -> F b</span>
+<span class="comment">// of :: a -> F a</span>
+
+<span class="comment">// 继承关系：Monad ⊃ Applicative ⊃ Functor</span></code></pre>
+
+    <hr>
+
+    <h2>八、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>类型类</th>
+                    <th>核心操作</th>
+                </tr>
+                <tr>
+                    <td>范畴</td>
+                    <td>-</td>
+                    <td>对象 + 态射</td>
+                </tr>
+                <tr>
+                    <td>函子</td>
+                    <td>Functor</td>
+                    <td>map / fmap</td>
+                </tr>
+                <tr>
+                    <td>应用函子</td>
+                    <td>Applicative</td>
+                    <td>ap, pure</td>
+                </tr>
+                <tr>
+                    <td>单子</td>
+                    <td>Monad</td>
+                    <td>flatMap / bind</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>恭喜你完成了函数式编程数学基础的完整学习！现在你已经具备了深入理解 FP 所需的所有数学背景。后续可以：</p>
+    <ul>
+        <li>学习 Haskell 或 OCaml 深入实践</li>
+        <li>阅读《Category Theory for Computing Science》深入范畴论</li>
+        <li>探索证明助手（Coq、Lean）</li>
+    </ul>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Category_theory" target="_blank">Category Theory - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Functor" target="_blank">Functor - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Monad_(category_theory)" target="_blank">Monad - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命题与谓词逻辑 - 函数式编程数学准备</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>命题与谓词逻辑 - 理解条件与类型约束</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="00-fp-math-basic-01-sets.html">集合论基础</a> 和 <a href="00-fp-math-basic-02-functions.html">函数基础</a>
+    </div>
+
+    <h2>一、为什么学逻辑？</h2>
+    <p>逻辑是 FP 的根基：</p>
+    <ul>
+        <li><strong>类型系统</strong>本质上是一种静态逻辑断言</li>
+        <li><strong>模式匹配</strong>是逻辑匹配的实现</li>
+        <li><strong>类型类</strong>是逻辑约束的表达</li>
+        <li><strong>证明助手</strong>（Coq、Lean）直接基于类型论</li>
+    </ul>
+
+    <hr>
+
+    <h2>二、命题逻辑</h2>
+    <p>命题是一个要么为<strong>真</strong>要么为<strong>假</strong>的陈述：</p>
+
+    <pre><code><span class="comment">// 命题示例</span>
+P: "今天下雨"        <span class="comment">// 可以为真或为假</span>
+Q: "2 + 2 = 4"       <span class="comment">// 永真</span>
+R: "2 + 2 = 5"       <span class="comment">// 永假</span>
+
+<span class="comment">// 在编程中，命题就是返回 Boolean 的表达式</span>
+<span class="keyword">const</span> <span class="function">isEven</span> = (n: number): boolean => n % <span class="number">2</span> === <span class="number">0</span>;</code></pre>
+
+    <h3>2.1 基本逻辑运算</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>运算</th>
+                <th>符号</th>
+                <th>定义</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>否定</td>
+                <td>¬P</td>
+                <td>P 为真时 ¬P 为假</td>
+            </tr>
+            <tr>
+                <td>合取</td>
+                <td>P ∧ Q</td>
+                <td>两者都为真时才为真</td>
+            </tr>
+            <tr>
+                <td>析取</td>
+                <td>P ∨ Q</td>
+                <td>至少有一个为真即为真</td>
+            </tr>
+            <tr>
+                <td>蕴含</td>
+                <td>P → Q</td>
+                <td>P 为真时 Q 必须为真</td>
+            </tr>
+            <tr>
+                <td>等价</td>
+                <td>P ↔ Q</td>
+                <td>P 和 Q 同真同假</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 真值表</h3>
+    <pre><code><span class="comment">// 否定 (NOT)</span>
+<span class="comment">// P    ¬P</span>
+<span class="comment">// T    F</span>
+<span class="comment">// F    T</span>
+
+<span class="comment">// 合取 (AND)</span>
+<span class="comment">// P    Q    P ∧ Q</span>
+<span class="comment">// T    T    T</span>
+<span class="comment">// T    F    F</span>
+<span class="comment">// F    T    F</span>
+<span class="comment">// F    F    F</span>
+
+<span class="comment">// 析取 (OR)</span>
+<span class="comment">// P    Q    P ∨ Q</span>
+<span class="comment">// T    T    T</span>
+<span class="comment">// T    F    T</span>
+<span class="comment">// F    T    T</span>
+<span class="comment">// F    F    F</span>
+
+<span class="comment">// 蕴含 (IMPLIES)  - 重点！</span>
+<span class="comment">// P    Q    P → Q</span>
+<span class="comment">// T    T    T</span>
+<span class="comment">// T    F    F</span>
+<span class="comment">// F    T    T  ← 注意：false ⇒ true 为真！</span>
+<span class="comment">// F    F    T  ← 注意：false ⇒ false 为真！</span></code></pre>
+
+    <h3>2.3 编程中的逻辑运算</h3>
+    <pre><code><span class="comment">// JavaScript 中的逻辑运算</span>
+<span class="keyword">const</span> P = <span class="keyword">true</span>;
+<span class="keyword">const</span> Q = <span class="keyword">false</span>;
+
+<span class="comment">// 否定</span>
+!P  <span class="comment">// false</span>
+
+<span class="comment">// 合取 (AND)</span>
+P && Q  <span class="comment">// false</span>
+
+<span class="comment">// 析取 (OR)</span>
+P || Q  <span class="comment">// true</span>
+
+<span class="comment">// 蕴含的逻辑等价</span>
+<span class="comment">// P → Q 等价于 !P || Q</span>
+<span class="keyword">const</span> <span class="function">implies</span> = (P: boolean, Q: boolean): boolean => !P || Q;
+
+<span class="comment">// 德摩根定律</span>
+<span class="comment">// !(P && Q) === (!P || !Q)</span>
+<span class="comment">// !(P || Q) === (!P && !Q)</span></code></pre>
+
+    <hr>
+
+    <h2>三、谓词逻辑</h2>
+    <p>谓词是带有变量的命题，返回值依赖于变量的值：</p>
+
+    <pre><code><span class="comment">// 谓词示例</span>
+<span class="comment">// P(x): "x 是偶数"</span>
+<span class="keyword">const</span> <span class="function">isEven</span> = (x: number): boolean => x % <span class="number">2</span> === <span class="number">0</span>;
+
+<span class="function">isEven</span>(<span class="number">4</span>)  <span class="comment">// true</span>
+<span class="function">isEven</span>(<span class="number">5</span>)  <span class="comment">// false</span>
+
+<span class="comment">// Q(x, y): "x < y"</span>
+<span class="keyword">const</span> <span class="function">lessThan</span> = (x: number, y: number): boolean => x < y;
+
+<span class="comment">// R(x): "x 是正数"</span>
+<span class="keyword">const</span> <span class="function">isPositive</span> = (x: number): boolean => x > <span class="number">0</span>;</code></pre>
+
+    <h3>3.1 量词</h3>
+    <p>量词用于表达「关于多少」的信息：</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>量词</th>
+                <th>符号</th>
+                <th>含义</th>
+                <th>编程对应</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>全称量词</td>
+                <td>∀</td>
+                <td>「对于所有」</td>
+                <td>Array.every()</td>
+            </tr>
+            <tr>
+                <td>存在量词</td>
+                <td>∃</td>
+                <td>「存在至少一个」</td>
+                <td>Array.some()</td>
+            </tr>
+            <tr>
+                <td>唯一量词</td>
+                <td>∃!</td>
+                <td>「恰好存在一个」</td>
+                <td>filter().length === 1</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="comment">// 全称量词：∀x, P(x)</span>
+<span class="comment">// "所有自然数都是非负的"</span>
+<span class="keyword">const</span> <span class="function">allNonNegative</span> = (nums: number[]): boolean =>
+  nums.<span class="function">every</span>(n => n >= <span class="number">0</span>);
+
+<span class="comment">// 存在量词：∃x, P(x)</span>
+<span class="comment">// "存在一个偶数"</span>
+<span class="keyword">const</span> <span class="function">hasEven</span> = (nums: number[]): boolean =>
+  nums.<span class="function">some</span>(n => n % <span class="number">2</span> === <span class="number">0</span>);
+
+<span class="comment">// 唯一量词：∃!x, P(x)</span>
+<span class="comment">// "恰好存在一个负数"</span>
+<span class="keyword">const</span> <span class="function">hasExactlyOneNegative</span> = (nums: number[]): boolean =>
+  nums.<span class="function">filter</span>(n => n < <span class="number">0</span>).length === <span class="number">1</span>;</code></pre>
+
+    <h3>3.2 量词的否定</h3>
+    <p>重要的等价关系：</p>
+    <span class="math">¬∀x P(x) ≡ ∃x ¬P(x)</span>
+    <span class="math">¬∃x P(x) ≡ ∀x ¬P(x)</span>
+
+    <pre><code><span class="comment">// 量词否定的编程意义</span>
+
+<span class="comment">// "不是所有元素都是偶数"</span>
+<span class="comment">// ≡ "存在至少一个元素不是偶数"</span>
+<span class="keyword">const</span> notAllEven = (nums: number[]): boolean =>
+  !nums.<span class="function">every</span>(n => n % <span class="number">2</span> === <span class="number">0</span>);
+
+<span class="keyword">const</span> existsNotEven = (nums: number[]): boolean =>
+  nums.<span class="function">some</span>(n => n % <span class="number">2</span> !== <span class="number">0</span>);
+
+<span class="comment">// "没有负数"</span>
+<span class="comment">// ≡ "所有元素都是非负的"</span>
+<span class="keyword">const</span> noNegatives = (nums: number[]): boolean =>
+  !nums.<span class="function">some</span>(n => n < <span class="number">0</span>);
+
+<span class="keyword">const</span> allNonNegative = (nums: number[]): boolean =>
+  nums.<span class="function">every</span>(n => n >= <span class="number">0</span>);</code></pre>
+
+    <hr>
+
+    <h2>四、逻辑与类型系统</h2>
+    <p>类型系统可以被理解为一种<strong>静态的谓词逻辑</strong>：</p>
+
+    <h3>4.1 类型作为命题</h3>
+    <pre><code><span class="comment">// 类型检查通过 = 命题被证明</span>
+<span class="comment">// 编写代码就是构造证明</span>
+
+<span class="comment">// 命题：x 是整数</span>
+<span class="keyword">const</span> x: number = <span class="number">5</span>;
+
+<span class="comment">// 命题：str 是字符串</span>
+<span class="keyword">const</span> str: string = <span class="string">"hello"</span>;
+
+<span class="comment">// 命题：user 是 User 类型</span>
+<span class="keyword">interface</span> <span class="function">User</span> { name: string; age: number; }
+<span class="keyword">const</span> user: User = { name: <span class="string">"Alice"</span>, age: <span class="number">30</span> };</code></pre>
+
+    <h3>4.2 函数类型作为蕴含</h3>
+    <p>函数类型 A → B 可以理解为「如果 A，则 B」：</p>
+    <span class="math">(A → B) ≡ "若 x 是 A 类型，则 f(x) 是 B 类型"</span>
+
+    <pre><code><span class="comment">// f: (x: number) => string</span>
+<span class="comment">// 蕴含：number → string</span>
+<span class="comment">// 含义：如果输入数字，输出字符串</span>
+
+<span class="keyword">const</span> <span class="function">toString</span> = (x: number): string => String(x);
+
+<span class="comment">// g: (x: number) => boolean</span>
+<span class="keyword">const</span> <span class="function">isPositive</span> = (x: number): boolean => x > <span class="number">0</span>;</code></pre>
+
+    <h3>4.3 Maybe 类型与偏函数</h3>
+    <p>Maybe 类型处理「值可能不存在」的情况：</p>
+    <pre><code><span class="comment">// Maybe a = Just a | Nothing</span>
+<span class="comment">// 这对应逻辑中的"可能为假"</span>
+
+<span class="keyword">type</span> <span class="function">Maybe</span>&lt;T&gt; = T | null;
+
+<span class="comment">// 安全的除法：可能返回 null</span>
+<span class="keyword">const</span> <span class="function">safeDivide</span> = (a: number, b: number): number | null =>
+  b === <span class="number">0</span> ? null : a / b;
+
+<span class="comment">// 这相当于一个偏谓词</span>
+<span class="comment">// P(x): "x 可以被安全地除"</span>
+<span class="comment">// 不是所有输入都有定义（对应偏函数）</span></code></pre>
+
+    <h3>4.4 Either 类型与错误处理</h3>
+    <p>Either 类型区分「成功」和「失败」两种情况：</p>
+    <pre><code><span class="comment">// Either a b = Left a | Right b</span>
+<span class="comment">// Left: 错误情况，Right: 成功情况</span>
+
+<span class="keyword">type</span> <span class="function">Either</span>&lt;L, R&gt; = { <span class="keyword">tag</span>: <span class="string">'Left'</span>, value: L } | { <span class="keyword">tag</span>: <span class="string">'Right'</span>, value: R };
+
+<span class="comment">// 安全的除法：明确返回错误</span>
+<span class="keyword">const</span> <span class="function">safeDivide</span> = (a: number, b: number): Either&lt;string, number&gt; =>
+  b === <span class="number">0</span>
+    ? { <span class="keyword">tag</span>: <span class="string">'Left'</span>, value: <span class="string">"Division by zero"</span> }
+    : { <span class="keyword">tag</span>: <span class="string">'Right'</span>, value: a / b };
+
+<span class="comment">// Either 对应逻辑中的"二选一"命题</span>
+<span class="comment">// "要么成功，要么失败" = 排中律的实现</span></code></pre>
+
+    <hr>
+
+    <h2>五、Curry-Howard 对应</h2>
+    <p>这是逻辑与类型系统最深刻的联系：</p>
+    <table>
+        <thead>
+            <tr>
+                <th>类型论</th>
+                <th>逻辑学</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>类型 A</td>
+                <td>命题 P</td>
+                <td>一个断言</td>
+            </tr>
+            <tr>
+                <td>项 M: A</td>
+                <td>命题 P 的证明</td>
+                <td>构造证据</td>
+            </tr>
+            <tr>
+                <td>A → B</td>
+                <td>P → Q (蕴含)</td>
+                <td>函数/推导</td>
+            </tr>
+            <tr>
+                <td>A × B</td>
+                <td>P ∧ Q (合取)</td>
+                <td>元组/且</td>
+            </tr>
+            <tr>
+                <td>A + B</td>
+                <td>P ∨ Q (析取)</td>
+                <td>联合类型/或</td>
+            </tr>
+            <tr>
+                <td>Void / 0</td>
+                <td>⊥ (假)</td>
+                <td>不可证明</td>
+            </tr>
+            <tr>
+                <td>Unit / 1</td>
+                <td>⊤ (真)</td>
+                <td>平凡真</td>
+            </tr>
+            <tr>
+                <td>∀a. T</td>
+                <td>∀x. P(x)</td>
+                <td>全称量词</td>
+            </tr>
+            <tr>
+                <td>∃a. T</td>
+                <td>∃x. P(x)</td>
+                <td>存在量词</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="comment">// Curry-Howard 对应示例
+
+// 类型：number
+// 对应命题："存在一个 number"</span>
+
+<span class="comment">// 类型：(a: number) => string</span>
+<span class="comment">// 对应命题："若 a 是 number，则 result 是 string"</span>
+
+<span class="comment">// 类型：[number, string]</span>
+<span class="comment">// 对应命题："a 是 number 且 b 是 string"</span>
+
+<span class="comment">// 类型：number | string</span>
+<span class="comment">// 对应命题："a 是 number 或 a 是 string"</span>
+
+<span class="comment">// 类型：never（不可达）</span>
+<span class="comment">// 对应命题："假"（永假）</span></code></pre>
+
+    <hr>
+
+    <h2>六、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>逻辑概念</th>
+                    <th>编程对应</th>
+                </tr>
+                <tr>
+                    <td>命题</td>
+                    <td>Boolean 表达式</td>
+                </tr>
+                <tr>
+                    <td>谓词</td>
+                    <td>返回 Boolean 的函数</td>
+                </tr>
+                <tr>
+                    <td>∀（全称）</td>
+                    <td>Array.every()</td>
+                </tr>
+                <tr>
+                    <td>∃（存在）</td>
+                    <td>Array.some()</td>
+                </tr>
+                <tr>
+                    <td>函数类型</td>
+                    <td>蕴含关系</td>
+                </tr>
+                <tr>
+                    <td>Maybe</td>
+                    <td>可能为空的值</td>
+                </tr>
+                <tr>
+                    <td>Either</td>
+                    <td>错误处理</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>理解逻辑与类型的对应关系，为学习 <strong>Lambda 演算</strong> 和 <strong>类型理论</strong> 打下坚实基础。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Propositional_calculus" target="_blank">Propositional Calculus - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence" target="_blank">Curry-Howard Correspondence - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集合论基础 - 函数式编程数学准备</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>集合论基础 - 函数式编程的数学地基</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>无。本文是函数式编程数学基础系列的第一篇。
+    </div>
+
+    <h2>一、为什么学集合论？</h2>
+    <p>集合论是现代数学的基石，也是理解函数式编程的起点。在 FP 中：</p>
+    <ul>
+        <li><strong>类型</strong> 就是集合</li>
+        <li><strong>函数</strong> 是集合之间的映射</li>
+        <li><strong>泛型</strong> 是集合的运算</li>
+    </ul>
+    <p>理解了集合论，你就理解了类型系统的本质。</p>
+
+    <hr>
+
+    <h2>二、集合的基本概念</h2>
+
+    <h3>2.1 什么是集合？</h3>
+    <p>集合（Set）是<strong>互不相同</strong>的对象的无序聚集。</p>
+    <pre><code><span class="comment">// 集合的表示</span>
+A = {1, 2, 3}          <span class="comment">// 有限集合</span>
+B = {1, 2, 3, ...}    <span class="comment">// 无限集合</span>
+N = {0, 1, 2, 3, ...} <span class="comment">// 自然数集合</span>
+∅ = {}                <span class="comment">// 空集</span></code></pre>
+
+    <h3>2.2 集合的关系</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>关系</th>
+                <th>符号</th>
+                <th>定义</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>属于</td>
+                <td>∈</td>
+                <td>x ∈ A 表示 x 是集合 A 的元素</td>
+            </tr>
+            <tr>
+                <td>子集</td>
+                <td>⊆</td>
+                <td>A ⊆ B 表示 A 的所有元素都在 B 中</td>
+            </tr>
+            <tr>
+                <td>真子集</td>
+                <td>⊂</td>
+                <td>A ⊂ B 表示 A ⊆ B 且 A ≠ B</td>
+            </tr>
+            <tr>
+                <td>相等</td>
+                <td>=</td>
+                <td>A = B 表示 A ⊆ B 且 B ⊆ A</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.3 集合的运算</h3>
+    <pre><code><span class="comment">// 并集 A ∪ B：属于 A 或属于 B 的元素</span>
+A = {1, 2, 3}
+B = {3, 4, 5}
+A ∪ B = {1, 2, 3, 4, 5}
+
+<span class="comment">// 交集 A ∩ B：同时属于 A 和 B 的元素</span>
+A ∩ B = {3}
+
+<span class="comment">// 差集 A \ B：属于 A 但不属于 B 的元素</span>
+A \ B = {1, 2}
+
+<span class="comment">// 补集 Aᶜ：属于全集 U 但不属于 A 的元素</span>
+U = {1, 2, 3, 4, 5}
+Aᶜ = {4, 5}</code></pre>
+
+    <hr>
+
+    <h2>三、笛卡尔积</h2>
+    <p>笛卡尔积是理解<strong>元组</strong>和<strong>函数参数</strong>的基础：</p>
+    <span class="math">A × B = {(a, b) | a ∈ A 且 b ∈ B}</span>
+
+    <pre><code><span class="comment">// 笛卡尔积的例子</span>
+A = {1, 2}
+B = {x, y}
+A × B = {(1, x), (1, y), (2, x), (2, y)}
+
+<span class="comment">// 在编程中的对应</span>
+<span class="comment">// type Pair = [number, string] 相当于 A × B</span>
+<span class="comment">// type User = { name: string, age: number } 相当于 {name} × {age}</span></code></pre>
+
+    <h3>为什么重要？</h3>
+    <p>函数的参数类型就是输入集合的笛卡尔积：</p>
+    <span class="math">f: (A₁ × A₂ × ... × Aₙ) → B</span>
+    <p>这正是我们定义多参数函数类型的方式！</p>
+
+    <hr>
+
+    <h2>四、关系</h2>
+    <p>关系是集合论中连接<strong>数学</strong>和<strong>编程</strong>的桥梁：</p>
+
+    <h3>4.1 关系的定义</h3>
+    <p>关系是笛卡尔积的子集：</p>
+    <span class="math">R ⊆ A × B</span>
+
+    <pre><code><span class="comment">// 关系示例</span>
+<span class="comment">// "小于"关系：R = {(x, y) | x < y}</span>
+<span class="comment">// 在编程中：x < y 返回布尔值</span>
+
+<span class="comment">// "等于"关系：R = {(x, x) | x ∈ A}</span>
+<span class="comment">// 在编程中：x === y 返回布尔值</span></code></pre>
+
+    <h3>4.2 关系的性质</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>性质</th>
+                <th>定义</th>
+                <th>编程对应</th>
+                <th>示例</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>自反性</td>
+                <td>∀x ∈ A, (x, x) ∈ R</td>
+                <td>x === x</td>
+                <td>相等关系 (=)</td>
+            </tr>
+            <tr>
+                <td>对称性</td>
+                <td>若 (x, y) ∈ R 则 (y, x) ∈ R</td>
+                <td>x === y ⇒ y === x</td>
+                <td>相等关系 (=)</td>
+            </tr>
+            <tr>
+                <td>传递性</td>
+                <td>若 (x, y) ∈ R 且 (y, z) ∈ R 则 (x, z) ∈ R</td>
+                <td>x &lt; y 且 y &lt; z ⇒ x &lt; z</td>
+                <td>小于关系 (&lt;)</td>
+            </tr>
+            <tr>
+                <td>反对称性</td>
+                <td>若 (x, y) ∈ R 且 (y, x) ∈ R 则 x = y</td>
+                <td>x ≤ y 且 y ≤ x ⇒ x === y</td>
+                <td>小于等于关系 (≤)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>4.3 关系的运算</h3>
+    <p>关系作为集合，也可以进行运算：</p>
+
+    <h4>逆关系</h4>
+    <span class="math">R⁻¹ = {(b, a) | (a, b) ∈ R}</span>
+    <pre><code><span class="comment">// 逆关系示例</span>
+R = {(1, 2), (1, 3), (2, 3)}     <span class="comment">// "小于"关系</span>
+R⁻¹ = {(2, 1), (3, 1), (3, 2)}  <span class="comment">// "大于"关系</span></code></pre>
+
+    <h4>复合关系</h4>
+    <span class="math">R ∘ S = {(a, c) | ∃b 使得 (a, b) ∈ R 且 (b, c) ∈ S}</span>
+    <pre><code><span class="comment">// 复合关系示例</span>
+R = {(1, 2), (2, 3)}      <span class="comment">// "是...的父亲"</span>
+S = {(2, 3), (3, 4)}      <span class="comment">// "是...的母亲"</span>
+R ∘ S = {(1, 3), (2, 4)} <span class="comment">// "是...的外婆"</span></code></pre>
+
+    <h3>4.4 特殊关系类型</h3>
+
+    <h4>等价关系</h4>
+    <p>满足<strong>自反</strong>、<strong>对称</strong>、<strong>传递</strong>的关系：</p>
+    <pre><code><span class="comment">// 等价关系的例子</span>
+<span class="comment">// 1. 数值相等：a = b</span>
+<span class="comment">// 2. 字符串相等：a === b</span>
+<span class="comment">// 3. 同余关系：a ≡ b (mod n) —— 模 n 同余</span>
+<span class="comment">// 4. 平面几何中的全等、相似</span>
+
+<span class="comment">// 在编程中：类型系统的相等</span>
+<span class="keyword">type</span> <span class="function">Equals</span>&lt;T&gt; = (a: T, b: T) => <span class="keyword">boolean</span></code></pre>
+
+    <h4>偏序关系</h4>
+    <p>满足<strong>自反</strong>、<strong>反对称</strong>、<strong>传递</strong>的关系：</p>
+    <pre><code><span class="comment">// 偏序关系的例子</span>
+<span class="comment">// 1. 小于等于：a ≤ b</span>
+<span class="comment">// 2. 集合包含：A ⊆ B</span>
+<span class="comment">// 3. 整除：a | b （a 整除 b）</span>
+<span class="comment">// 4. 字符串前缀：a 是 b 的前缀</span>
+
+<span class="comment">// 在编程中：类型的子类型关系</span>
+<span class="comment">// string extends string ✓ 自反</span>
+<span class="comment">// string extends number && number extends string ⇒ string = number ✗ 反对称</span></code></pre>
+
+    <h4>全序关系</h4>
+    <p>偏序关系 + 任意两元素可比：</p>
+    <pre><code><span class="comment">// 全序关系的例子</span>
+<span class="comment">// 1. 数值大小：a ≤ b</span>
+<span class="comment">// 2. 字典序：字符串比较</span>
+<span class="comment">// 3. 时间顺序：先后关系</span>
+
+<span class="comment">// 非全序的例子：集合的包含关系</span>
+<span class="comment">// {1} ⊆ {2}？不可比较！</span></code></pre>
+
+    <h3>4.5 关系的编程应用</h3>
+    <pre><code><span class="comment">// 关系在编程中的实际应用</span>
+
+<span class="comment">// 1. 验证关系：检查是否满足某种关系</span>
+<span class="keyword">const</span> <span class="function">isLessThan</span> = (a: number, b: number): <span class="keyword">boolean</span> => a &lt; b
+<span class="comment">// isLessThan(1, 2) === true</span>
+
+<span class="comment">// 2. 等价关系：自定义相等</span>
+<span class="keyword">const</span> <span class="function">equalsByLength</span> = (a: string, b: string): <span class="keyword">boolean</span> => a.length === b.length
+<span class="comment">// equalsByLength("hi", "yo") === true</span>
+
+<span class="comment">// 3. 偏序关系：依赖排序</span>
+<span class="keyword">const</span> deps = {
+  <span class="string">'css'</span>: [<span class="string">'html'</span>],
+  <span class="string">'js'</span>: [<span class="string">'html'</span>],
+  <span class="string">'html'</span>: [],
+}
+<span class="comment">// html ≤ css, html ≤ js —— 偏序关系</span>
+
+<span class="comment">// 4. 等价类：分区(groupBy)</span>
+<span class="keyword">const</span> <span class="function">groupBy</span> = &lt;T&gt;(arr: T[], <span class="function">eq</span>: (a: T, b: T) => <span class="keyword">boolean</span>): T[][] => {
+  <span class="comment">// eq 是等价关系，将数组划分为等价类</span>
+}
+<span class="comment">// groupBy([1,2,3,4], (a,b) => a % 2 === b % 2)</span>
+<span class="comment">// 结果: [[1,3], [2,4]] —— 奇数一组，偶数一组</span></code></pre>
+
+    <hr>
+
+    <h2>五、函数：特殊的关系</h2>
+    <p>函数是关系的一种<strong>特殊类型</strong>，它满足：</p>
+    <ol>
+        <li><strong>定义域</strong>（Domain）：所有可能的输入</li>
+        <li><strong>值域</strong>（Codomain）：所有可能的输出</li>
+        <li><strong>唯一性</strong>：每个输入有且仅有一个输出</li>
+    </ol>
+
+    <span class="math">f: A → B</span>
+    <p>表示 f 是从集合 A 到集合 B 的函数。</p>
+
+    <pre><code><span class="comment">// 函数的类型签名</span>
+<span class="comment">// f: A → B 意味着：</span>
+<span class="comment">// - 输入：类型 A 的值</span>
+<span class="comment">// - 输出：类型 B 的值</span>
+
+<span class="comment">// 在 TypeScript 中</span>
+<span class="keyword">function</span> <span class="function">add</span>(a: number, b: number): number { <span class="keyword">return</span> a + b; }
+<span class="comment">// 类型: (number × number) → number</span>
+
+<span class="comment">// 在 Haskell 中</span>
+<span class="comment">-- add :: Num a => a -> a -> a</span>
+<span class="comment">-- add a b = a + b</span></code></pre>
+
+    <hr>
+
+    <h2>六、幂集</h2>
+    <p>幂集是一个集合的所有子集的集合：</p>
+    <span class="math">P(A) = {X | X ⊆ A}</span>
+
+    <pre><code><span class="comment">// 幂集示例</span>
+A = {1, 2}
+P(A) = {∅, {1}, {2}, {1, 2}}
+
+<span class="comment">// 幂集在编程中的应用</span>
+<span class="comment">// Maybe a = Nothing | Just a  相当于 {∅, {a}}</span>
+<span class="comment">// Either a b = Left a | Right b  相当于 {a} ∪ {b}</span></code></pre>
+
+    <hr>
+
+    <h2>七、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>编程对应</th>
+                </tr>
+                <tr>
+                    <td>集合</td>
+                    <td>类型（Type）</td>
+                </tr>
+                <tr>
+                    <td>元素</td>
+                    <td>值（Value）</td>
+                </tr>
+                <tr>
+                    <td>笛卡尔积</td>
+                    <td>元组、参数列表</td>
+                </tr>
+                <tr>
+                    <td>关系</td>
+                    <td>布尔函数、断言</td>
+                </tr>
+                <tr>
+                    <td>函数</td>
+                    <td>纯函数</td>
+                </tr>
+                <tr>
+                    <td>幂集</td>
+                    <td>Maybe, Either 等类型构造</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>集合论是理解函数式编程类型系统的钥匙。下一章我们将深入探讨<strong>函数</strong>本身。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Set_theory" target="_blank">Set Theory - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Cartesian_product" target="_blank">Cartesian Product - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>

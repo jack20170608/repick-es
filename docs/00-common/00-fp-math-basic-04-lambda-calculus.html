@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambda 演算 - 函数式编程的理论基石</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Lambda 演算 - 函数式编程的理论基石</h1>
+
+    <div class="note">
+        <strong>前置知识：</strong>建议先阅读 <a href="00-fp-math-basic-01-sets.html">集合论基础</a>、<a href="00-fp-math-basic-02-functions.html">函数基础</a>、<a href="00-fp-math-basic-03-logic.html">命题与谓词逻辑</a>
+    </div>
+
+    <h2>一、什么是 Lambda 演算？</h2>
+    <p>Lambda 演算（λ-calculus）由 <strong>阿隆佐·丘奇</strong>（Alonzo Church）在 1936 年发明，是一套<strong>函数定义和应用</strong>的形式系统。</p>
+
+    <h3>核心思想</h3>
+    <p>一切皆函数，一切皆表达式。</p>
+    <ul>
+        <li>函数是一等公民（first-class citizen）</li>
+        <li>函数可以接受函数作为参数</li>
+        <li>函数可以返回函数作为结果</li>
+    </ul>
+
+    <pre><code><span class="comment">// Lambda 演算的语法</span>
+<span class="comment">// λx. body  表示一个函数：输入 x，返回 body</span>
+
+<span class="comment">// 示例：恒等函数</span>
+λx. x
+
+<span class="comment">// 示例：常数函数</span>
+λx. 5
+
+<span class="comment">// 示例：加法函数</span>
+λx. λy. x + y</code></pre>
+
+    <hr>
+
+    <h2>二、语法定义</h2>
+    <p>Lambda 演算的语法极其简洁，只有三种表达式：</p>
+
+    <h3>2.1 语法糖</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>语法</th>
+                <th>名称</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>x</code></td>
+                <td>变量</td>
+                <td>一个符号，表示参数</td>
+            </tr>
+            <tr>
+                <td><code>λx. M</code></td>
+                <td>抽象（Abstraction）</td>
+                <td>定义一个函数，x 是参数，M 是函数体</td>
+            </tr>
+            <tr>
+                <td><code>M N</code></td>
+                <td>应用（Application）</td>
+                <td>将函数 M 应用到参数 N 上</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>2.2 语法树</h3>
+    <pre><code><span class="comment">// 表达式：λx. (λy. x y)</span>
+<span class="comment">// 树形结构：</span>
+<span class="comment">//       λx.</span>
+<span class="comment">//         λy.</span>
+<span class="comment">//           (x y)</span>
+<span class="comment">//             ↑   ↑</span>
+<span class="comment">//          x    y (函数应用)</span></code></pre>
+
+    <hr>
+
+    <h2>三、Alpha 转换</h2>
+    <p>Alpha 转换（α-conversion）是指<strong>改变 bound 变量的名称</strong>：</p>
+    <span class="math">λx. M ≡ λy. M[x/y]</span>
+    <p>其中 M[x/y] 表示把 M 中所有自由的 x 替换为 y。</p>
+
+    <pre><code><span class="comment">// Alpha 转换示例</span>
+<span class="comment">// λx. x  ≡  λy. y</span>
+<span class="comment">// λx. (λy. x y)  ≡  λa. (λb. a b)</span>
+
+<span class="comment">// 为什么要改名字？避免捕获</span>
+<span class="comment">// λx. (λx. x)  中的内层 x 不会和外层 x 冲突</span>
+<span class="comment">// 因为它们是不同的绑定作用域</span></code></pre>
+
+    <hr>
+
+    <h2>四、Beta 归约</h2>
+    <p>Beta 归约（β-reduction）是<strong>函数应用</strong>的核心操作：</p>
+    <span class="math">(λx. M) N → M[x/N]</span>
+    <p>把函数体中的 x 替换为参数 N。</p>
+
+    <h3>4.1 简单示例</h3>
+    <pre><code><span class="comment">// (λx. x) y  →  y</span>
+<span class="comment">// 把 x 替换为 y</span>
+
+<span class="comment">// (λx. λy. x + y) 3 4  →  (λy. 3 + y) 4  →  3 + 4  →  7</span>
+<span class="comment">// 两次 Beta 归约</span></code></pre>
+
+    <h3>4.2 编程实现</h3>
+    <pre><code><span class="comment">// 简单的 Lambda 演算解释器</span>
+
+<span class="comment">// 表达式类型</span>
+<span class="keyword">type</span> <span class="function">Expr</span> =
+  | { <span class="keyword">tag</span>: <span class="string">'Var'</span>, name: string }
+  | { <span class="keyword">tag</span>: <span class="string">'Abs'</span>, param: string, body: Expr }
+  | { <span class="keyword">tag</span>: <span class="string">'App'</span>, fn: Expr, arg: Expr };
+
+<span class="comment">// Beta 归约</span>
+<span class="keyword">function</span> <span class="function">betaReduce</span>(expr: Expr): Expr {
+  <span class="keyword">switch</span> (expr.<span class="keyword">tag</span>) {
+    <span class="keyword">case</span> <span class="string">'Var'</span>:
+      <span class="keyword">return</span> expr;
+
+    <span class="keyword">case</span> <span class="string">'Abs'</span>:
+      <span class="keyword">return</span> {
+        ...expr,
+        body: <span class="function">betaReduce</span>(expr.body)  <span class="comment">// 归约函数体</span>
+      };
+
+    <span class="keyword">case</span> <span class="string">'App'</span>: {
+      <span class="keyword">const</span> fn = <span class="function">betaReduce</span>(expr.fn);
+      <span class="keyword">const</span> arg = <span class="function">betaReduce</span>(expr.arg);
+
+      <span class="comment">// 如果函数是一个抽象，执行 Beta 归约</span>
+      <span class="keyword">if</span> (fn.<span class="keyword">tag</span> === <span class="string">'Abs'</span>) {
+        <span class="keyword">return</span> <span class="function">substitute</span>(fn.body, fn.param, arg);
+      }
+
+      <span class="keyword">return</span> { <span class="keyword">tag</span>: <span class="string">'App'</span>, fn, arg };
+    }
+  }
+}
+
+<span class="comment">// 替换：把 body 中的 var 替换为 value</span>
+<span class="keyword">function</span> <span class="function">substitute</span>(body: Expr, <span class="keyword">var</span>: string, value: Expr): Expr {
+  <span class="keyword">switch</span> (body.<span class="keyword">tag</span>) {
+    <span class="keyword">case</span> <span class="string">'Var'</span>:
+      <span class="keyword">return</span> body.name === <span class="keyword">var</span> ? value : body;
+
+    <span class="keyword">case</span> <span class="string">'Abs'</span>:
+      <span class="comment">// Alpha 转换：避免变量捕获</span>
+      <span class="keyword">if</span> (body.param === <span class="keyword">var</span>) <span class="keyword">return</span> body;
+      <span class="keyword">const</span> newParam = <span class="function">freshVar</span>(body.param, value);
+      <span class="keyword">const</span> newBody = <span class="function">substitute</span>(
+        <span class="function">substitute</span>(body.body, body.param, { <span class="keyword">tag</span>: <span class="string">'Var'</span>, name: newParam }),
+        <span class="keyword">var</span>,
+        value
+      );
+      <span class="keyword">return</span> { <span class="keyword">tag</span>: <span class="string">'Abs'</span>, param: newParam, body: newBody };
+
+    <span class="keyword">case</span> <span class="string">'App'</span>:
+      <span class="keyword">return</span> {
+        <span class="keyword">tag</span>: <span class="string">'App'</span>,
+        fn: <span class="function">substitute</span>(body.fn, <span class="keyword">var</span>, value),
+        arg: <span class="function">substitute</span>(body.arg, <span class="keyword">var</span>, value)
+      };
+  }
+}</code></pre>
+
+    <hr>
+
+    <h2>五、Eta 转换</h2>
+    <p>Eta 转换（η-conversion）描述了<strong>函数的 extensionality</strong>（外延性）：</p>
+    <span class="math">λx. (M x) ≡ M</span>
+    <p>前提：x 不在 M 中自由出现。</p>
+
+    <pre><code><span class="comment">// Eta 转换示例</span>
+<span class="comment">// λx. (f x)  ≡  f</span>
+<span class="comment">// 如果一个函数接受参数 x，然后立即把 f 应用到 x 上</span>
+<span class="comment">// 那么它就等价于 f 本身</span>
+
+<span class="comment">// JavaScript 示例</span>
+<span class="keyword">const</span> f = x => x + <span class="number">1</span>;
+<span class="keyword">const</span> g = x => f(x);  <span class="comment">// g ≡ f</span></code></pre>
+
+    <hr>
+
+    <h2>六、Church 编码</h2>
+    <p>Church 编码是用 Lambda 演算表示<strong>基本数据</strong>的方法。</p>
+
+    <h3>6.1 Church 布尔值</h3>
+    <pre><code><span class="comment">// Church 布尔值</span>
+<span class="keyword">const</span> <span class="function">TRUE</span>  = λx. λy. x;   <span class="comment">// 选择第一个参数</span>
+<span class="keyword">const</span> <span class="function">FALSE</span> = λx. λy. y;   <span class="comment">// 选择第二个参数</span>
+
+<span class="comment">// NOT</span>
+<span class="keyword">const</span> <span class="function">NOT</span> = λp. λx. λy. p y x;
+
+<span class="comment">// AND</span>
+<span class="keyword">const</span> <span class="function">AND</span> = λp. λq. p q p;
+
+<span class="comment">// OR</span>
+<span class="keyword">const</span> <span class="function">OR</span>  = λp. λq. p p q;
+
+<span class="comment">// IF</span>
+<span class="keyword">const</span> <span class="function">IF</span> = λp. λx. λy. p x y;</code></pre>
+
+    <h3>6.2 Church 数字</h3>
+    <pre><code><span class="comment">// Church 数字：n = λf. λx. fⁿ(x)</span>
+<span class="keyword">const</span> <span class="function">ZERO</span>  = λf. λx. x;
+<span class="keyword">const</span> <span class="function">ONE</span>   = λf. λx. f x;
+<span class="keyword">const</span> <span class="function">TWO</span>   = λf. λx. f (f x);
+<span class="keyword">const</span> <span class="function">THREE</span> = λf. λx. f (f (f x));
+<span class="keyword">const</span> <span class="function">FOUR</span>  = λf. λx. f (f (f (f x)));
+
+<span class="comment">// SUCC（后继）</span>
+<span class="keyword">const</span> <span class="function">SUCC</span> = λn. λf. λx. f (n f x);
+
+<span class="comment">// ADD（加法）</span>
+<span class="keyword">const</span> <span class="function">ADD</span> = λm. λn. λf. λx. m f (n f x);
+
+<span class="comment">// MULT（乘法）</span>
+<span class="keyword">const</span> <span class="function">MULT</span> = λm. λn. λf. m (n f);
+
+<span class="comment">// PRED（前驱）</span>
+<span class="keyword">const</span> <span class="function">PRED</span> = λn. λf. λx.
+  n (λg. λh. h (g f)) (λy. x) (λy. y);</code></pre>
+
+    <h3>6.3 Church 列表</h3>
+    <pre><code><span class="comment">// Church 列表</span>
+<span class="comment">// [a, b, c] = λc. λn. c a (c b (c c n))</span>
+
+<span class="comment">// CONS（构造）</span>
+<span class="keyword">const</span> <span class="function">CONS</span> = λh. λt. λc. λn. c h (t c n);
+
+<span class="comment">// CAR（取头）</span>
+<span class="keyword">const</span> <span class="function">CAR</span> = λp. p (λh. λt. h);
+
+<span class="comment">// CDR（取尾）</span>
+<span class="keyword">const</span> <span class="function">CDR</span> = λp. p (λh. λt. t);
+
+<span class="comment">// NIL（空列表）</span>
+<span class="keyword">const</span> <span class="function">NIL</span> = λc. λn. n;
+
+<span class="comment">// IS_NIL（判断空）</span>
+<span class="keyword">const</span> <span class="function">IS_NIL</span> = λp. p (λh. λt. FALSE) TRUE;</code></pre>
+
+    <hr>
+
+    <h2>七、编程语言中的 Lambda 演算</h2>
+
+    <h3>7.1 JavaScript</h3>
+    <pre><code><span class="comment">// JavaScript 箭头函数就是 Lambda 表达式</span>
+
+<span class="comment">// λx. x  →  x => x</span>
+<span class="keyword">const</span> identity = x => x;
+
+<span class="comment">// λx. λy. x + y  →  x => y => x + y</span>
+<span class="keyword">const</span> add = x => y => x + y;
+
+<span class="comment">// 应用：(add 3) 4  →  7</span>
+console.<span class="function">log</span>(add(<span class="number">3</span>)(<span class="number">4</span>));  <span class="comment">// 7</span></code></pre>
+
+    <h3>7.2 Haskell</h3>
+    <pre><code><span class="comment">-- Lambda 表达式</span>
+<span class="comment">-- λx -> x</span>
+identity = \x -> x
+
+<span class="comment">-- λx -> λy -> x + y</span>
+add = \x -> \y -> x + y
+
+<span class="comment">-- 应用：add 3 4</span>
+<span class="comment">-- :t add  →  Num a => a -> a -> a</span></code></pre>
+
+    <h3>7.3 Python</h3>
+    <pre><code><span class="comment"># Lambda 表达式</span>
+<span class="comment"># lambda x: x</span>
+identity = <span class="keyword">lambda</span> x: x
+
+<span class="comment"># lambda x: lambda y: x + y</span>
+add = <span class="keyword">lambda</span> x: <span class="keyword">lambda</span> y: x + y
+
+<span class="comment"># 应用：add(3)(4)</span>
+print(add(<span class="number">3</span>)(<span class="number">4</span>))  <span class="comment"># 7</span></code></pre>
+
+    <hr>
+
+    <h2>八、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>概念</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>λx. M</td>
+                    <td>抽象，定义函数</td>
+                </tr>
+                <tr>
+                    <td>M N</td>
+                    <td>应用，调用函数</td>
+                </tr>
+                <tr>
+                    <td>α 转换</td>
+                    <td>变量重命名</td>
+                </tr>
+                <tr>
+                    <td>β 归约</td>
+                    <td>函数应用（核心操作）</td>
+                </tr>
+                <tr>
+                    <td>η 转换</td>
+                    <td>函数外延性</td>
+                </tr>
+                <tr>
+                    <td>Church 编码</td>
+                    <td>用函数表示数据</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>Lambda 演算是所有函数式编程语言的的理论基础。理解了 Lambda 演算，你就理解了 FP 的本质。下一章我们将学习<strong>类型理论</strong>，了解如何给 Lambda 演算加上类型约束。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Lambda_calculus" target="_blank">Lambda Calculus - Wikipedia</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Alonzo_Church" target="_blank">Alonzo Church - Wikipedia</a></li>
+        <li><a href="https://合格.org/wiki/Church_encoding" target="_blank">Church Encoding - Wikipedia</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>
