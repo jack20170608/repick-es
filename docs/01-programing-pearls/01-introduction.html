@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编程珠玑 - 学习指南</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --code-bg: #f4f4f4;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-color);
+            background: #fff;
+        }
+
+        h1 { font-size: 2em; color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { font-size: 1.5em; color: var(--primary-color); margin-top: 40px; padding-left: 15px; border-left: 4px solid var(--accent-color); }
+        h3 { font-size: 1.2em; color: #555; margin-top: 25px; }
+        p { margin: 15px 0; }
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .note { background: #e8f4fd; border-left: 4px solid var(--accent-color); padding: 15px 20px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        .note strong { color: var(--accent-color); }
+
+        code { font-family: 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e74c3c; }
+
+        pre { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; color: #abb2bf; font-size: 0.85em; }
+
+        .comment { color: #5c6370; font-style: italic; }
+        .keyword { color: #c678dd; }
+        .function { color: #61afef; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background: var(--bg-color); font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        blockquote { border-left: 4px solid #ddd; margin: 20px 0; padding: 10px 20px; color: #666; background: #fafafa; }
+
+        .math { font-family: 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 10px 15px; display: block; text-align: center; border-radius: 4px; margin: 20px 0; }
+        .summary-table { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .summary-table table { margin: 0; }
+
+        footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>编程珠玑 - 学习指南</h1>
+
+    <div class="note">
+        <strong>书籍信息：</strong>
+        <ul>
+            <li>原名：Programming Pearls</li>
+            <li>作者：Jon Bentley</li>
+            <li>初版：1986年 | 第二版：1999年</li>
+            <li>豆瓣评分：9.1</li>
+        </ul>
+    </div>
+
+    <h2>一、书籍简介</h2>
+    <p>《编程珠玑》是计算机科学领域的经典著作，由贝尔实验室的 Jon Bentley 编写。</p>
+    <p>本书不是一本算法教科书，而是一本关于<strong>编程思考方式</strong>的书。它强调：</p>
+    <ul>
+        <li><strong>问题分析</strong> - 在动手写代码之前，充分理解问题</li>
+        <li><strong>算法选择</strong> - 正确的算法比硬件更重要</li>
+        <li><strong>代码质量</strong> - 简洁、优雅、可读的代码</li>
+        <li><strong>性能优化</strong> - 找到真正的瓶颈，而不是过早优化</li>
+    </ul>
+
+    <h3>核心哲学</h3>
+    <blockquote>
+        "正确的程序还不够，还要写出<strong>高效</strong>的程序。"
+    </blockquote>
+    <blockquote>
+        "编程的本质是<strong>思考</strong>，而不是打字。"
+    </blockquote>
+
+    <hr>
+
+    <h2>二、章节结构</h2>
+    <p>全书分为三部分，共15章：</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>部分</th>
+                <th>章数</th>
+                <th>主题</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>第一部分：基础</td>
+                <td>1-5章</td>
+                <td>编程基础技巧</td>
+            </tr>
+            <tr>
+                <td>第二部分：性能</td>
+                <td>6-10章</td>
+                <td>算法与性能优化</td>
+            </tr>
+            <tr>
+                <td>第三部分：应用</td>
+                <td>11-15章</td>
+                <td>实际应用案例</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>三、章节详解</h2>
+
+    <h3>第一部分：基础</h3>
+
+    <h4>第1章：开篇</h4>
+    <p>讨论编程中的问题分析和解决策略。</p>
+    <ul>
+        <li>如何正确理解问题</li>
+        <li>简单的算法往往最好</li>
+        <li>代码的可读性至关重要</li>
+    </ul>
+
+    <h4>第2章：啊哈！算法</h4>
+    <p>介绍基本的算法思想。</p>
+    <ul>
+        <li>二分搜索</li>
+        <li>插入排序</li>
+        <li>时间复杂度分析</li>
+    </ul>
+
+    <h4>第3章：数据决定程序结构</h4>
+    <p>强调数据结构的重要性。</p>
+    <ul>
+        <li>选择合适的数据结构</li>
+        <li>数组、链表、树的应用场景</li>
+        <li>数据的表示方式影响算法</li>
+    </ul>
+
+    <h4>第4章：编写正确的程序</h4>
+    <p>程序正确性验证。</p>
+    <ul>
+        <li>调试技巧</li>
+        <li>断言的使用</li>
+        <li>测试驱动开发的思想</li>
+    </ul>
+
+    <h4>第5章：编程小事</h4>
+    <p>日常编程中的小技巧。</p>
+    <ul>
+        <li>代码审查</li>
+        <li>文档编写</li>
+        <li>错误处理</li>
+    </ul>
+
+    <h3>第二部分：性能</h3>
+
+    <h4>第6章：程序性能分析</h4>
+    <p>如何分析和理解程序性能。</p>
+    <ul>
+        <li>性能度量方法</li>
+        <li>Amdahl 定律</li>
+        <li>热点分析</li>
+    </ul>
+
+    <h4>第7章：粗略估算</h4>
+    <p>快速估算程序性能。</p>
+    <ul>
+        <li>2的幂次法则</li>
+        <li>Little 定律</li>
+        <li>快速近似计算</li>
+    </ul>
+
+    <h4>第8章：算法设计技术</h4>
+    <p>高级算法设计策略。</p>
+    <ul>
+        <li>分治法</li>
+        <li>动态规划</li>
+        <li>贪心算法</li>
+    </ul>
+
+    <h4>第9章：代码优化</h4>
+    <p>实际的性能优化技巧。</p>
+    <ul>
+        <li>循环优化</li>
+        <li>内存布局</li>
+        <li>缓存友好</li>
+    </ul>
+
+    <h4>第10章：节省空间</h4>
+    <p>内存优化策略。</p>
+    <ul>
+        <li>数据结构压缩</li>
+        <li>垃圾回收</li>
+        <li>内存池</li>
+    </ul>
+
+    <h3>第三部分：应用</h3>
+
+    <h4>第11章：排序</h4>
+    <p>排序算法的深入分析。</p>
+    <ul>
+        <li>快速排序</li>
+        <li>归并排序</li>
+        <li>外部排序</li>
+    </ul>
+
+    <h4>第12章：问题查找</h4>
+    <p>搜索相关问题。</p>
+    <ul>
+        <li>二分搜索变体</li>
+        <li>哈希表</li>
+        <li>字符串搜索</li>
+    </ul>
+
+    <h4>第13章：堆操作</h4>
+    <p>堆和优先级队列。</p>
+    <ul>
+        <li>二叉堆</li>
+        <li>堆排序</li>
+        <li>优先队列应用</li>
+    </ul>
+
+    <h4>第14章：字符串</h4>
+    <p>字符串处理技术。</p>
+    <ul>
+        <li>字符串搜索算法</li>
+        <li>字符串比较</li>
+        <li>正则表达式</li>
+    </ul>
+
+    <h4>第15章：原则</h4>
+    <p>编程原则总结。</p>
+    <ul>
+        <li>KISS 原则</li>
+        <li>YAGNI 原则</li>
+        <li>DRY 原则</li>
+    </ul>
+
+    <hr>
+
+    <h2>四、核心知识点</h2>
+
+    <h3>4.1 时间复杂度</h3>
+    <pre><code><span class="comment">// 常见时间复杂度（从快到慢）</span>
+O(1)        <span class="comment">// 常数时间 - 数组随机访问</span>
+O(log n)    <span class="comment">// 对数时间 - 二分搜索</span>
+O(n)        <span class="comment">// 线性时间 - 遍历</span>
+O(n log n)  <span class="comment">// 线性对数时间 - 快速排序</span>
+O(n²)       <span class="comment">// 平方时间 - 冒泡排序</span>
+O(2ⁿ)       <span class="comment">// 指数时间 - 递归斐波那契</span>
+O(n!)       <span class="comment">// 阶乘时间 - 全排列</span></code></pre>
+
+    <h3>4.2 空间复杂度</h3>
+    <pre><code><span class="comment">// 空间复杂度分析</span>
+<span class="comment">// 原地算法：O(1) 额外空间</span>
+<span class="comment">// 递归算法：注意调用栈深度</span>
+
+<span class="comment">// 示例：反转数组</span>
+<span class="keyword">function</span> <span class="function">reverse</span>(arr: number[]): number[] {
+  <span class="keyword">const</span> result: number[] = [];  <span class="comment">// O(n) 空间</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = arr.length - <span class="number">1</span>; i >= <span class="number">0</span>; i--) {
+    result.<span class="function">push</span>(arr[i]);
+  }
+  <span class="keyword">return</span> result;
+}
+
+<span class="comment">// 原地版本：O(1) 空间</span>
+<span class="keyword">function</span> <span class="function">reverseInPlace</span>(arr: number[]): <span class="keyword">void</span> {
+  <span class="keyword">let</span> left = <span class="number">0</span>;
+  <span class="keyword">let</span> right = arr.length - <span class="number">1</span>;
+  <span class="keyword">while</span> (left < right) {
+    [arr[left], arr[right]] = [arr[right], arr[left]];
+    left++;
+    right--;
+  }
+}</code></pre>
+
+    <h3>4.3 二分搜索</h3>
+    <pre><code><span class="comment">// 标准二分搜索</span>
+<span class="keyword">function</span> <span class="function">binarySearch</span>&lt;T&gt;(arr: T[], target: T, compare: (a: T, b: T) => number): number {
+  <span class="keyword">let</span> left = <span class="number">0</span>;
+  <span class="keyword">let</span> right = arr.length - <span class="number">1</span>;
+
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+    <span class="keyword">const</span> cmp = compare(arr[mid], target);
+
+    <span class="keyword">if</span> (cmp === <span class="number">0</span>) {
+      <span class="keyword">return</span> mid;  <span class="comment">// 找到</span>
+    } <span class="keyword">else if</span> (cmp < <span class="number">0</span>) {
+      left = mid + <span class="number">1</span>;
+    } <span class="keyword">else</span> {
+      right = mid - <span class="number">1</span>;
+    }
+  }
+
+  <span class="keyword">return</span> -<span class="number">1</span>;  <span class="comment">// 未找到</span>
+}
+
+<span class="comment">// 变体：查找第一个/最后一个</span>
+<span class="keyword">function</span> <span class="function">findFirst</span>&lt;T&gt;(arr: T[], target: T): number {
+  <span class="keyword">let</span> left = <span class="number">0</span>, right = arr.length - <span class="number">1</span>, result = -<span class="number">1</span>;
+
+  <span class="keyword">while</span> (left <= right) {
+    <span class="keyword">const</span> mid = Math.<span class="function">floor</span>((left + right) / <span class="number">2</span>);
+    <span class="keyword">if</span> (arr[mid] === target) {
+      result = mid;
+      right = mid - <span class="number">1</span>;  <span class="comment">// 继续向左找</span>
+    } <span class="keyword">else if</span> (arr[mid] < target) {
+      left = mid + <span class="number">1</span>;
+    } <span class="keyword">else</span> {
+      right = mid - <span class="number">1</span>;
+    }
+  }
+
+  <span class="keyword">return</span> result;
+}</code></pre>
+
+    <h3>4.4 散列（Hash）</h3>
+    <pre><code><span class="comment">// 简单的哈希表实现</span>
+<span class="keyword">class</span> <span class="function">HashMap</span>&lt;K, V&gt; {
+  <span class="keyword">private</span> buckets: Map&lt;number, [K, V][]&gt; = <span class="keyword">new</span> Map();
+
+  <span class="function">hash</span>(key: K): number {
+    <span class="keyword">const</span> str = String(key);
+    <span class="keyword">let</span> hash = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < str.length; i++) {
+      hash = ((hash << <span class="number">5</span>) - hash) + str.charCodeAt(i);
+      hash = hash & hash;  <span class="comment">// 防止溢出</span>
+    }
+    <span class="keyword">return</span> Math.<span class="function">abs</span>(hash);
+  }
+
+  <span class="function">set</span>(key: K, value: V): <span class="keyword">void</span> {
+    <span class="keyword">const</span> h = <span class="function">hash</span>(key);
+    <span class="keyword">const</span> bucket = <span class="keyword">this</span>.buckets.<span class="function">get</span>(h) || [];
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < bucket.length; i++) {
+      <span class="keyword">if</span> (bucket[i][<span class="number">0</span>] === key) {
+        bucket[i][<span class="number">1</span>] = value;
+        <span class="keyword">return</span>;
+      }
+    }
+    bucket.<span class="function">push</span>([key, value]);
+    <span class="keyword">this</span>.buckets.<span class="function">set</span>(h, bucket);
+  }
+
+  <span class="function">get</span>(key: K): V | undefined {
+    <span class="keyword">const</span> h = <span class="function">hash</span>(key);
+    <span class="keyword">const</span> bucket = <span class="keyword">this</span>.buckets.<span class="function">get</span>(h);
+    <span class="keyword">if</span> (!bucket) <span class="keyword">return</span> undefined;
+    <span class="keyword">for</span> (<span class="keyword">const</span> [k, v] of bucket) {
+      <span class="keyword">if</span> (k === key) <span class="keyword">return</span> v;
+    }
+    <span class="keyword">return</span> undefined;
+  }
+}</code></pre>
+
+    <h3>4.5 堆排序</h3>
+    <pre><code><span class="comment">// 堆排序</span>
+<span class="keyword">function</span> <span class="function">heapSort</span>(arr: number[]): number[] {
+  <span class="keyword">const</span> n = arr.length;
+
+  <span class="comment">// 构建最大堆</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = Math.<span class="function">floor</span>(n / <span class="number">2</span>) - <span class="number">1</span>; i >= <span class="number">0</span>; i--) {
+    <span class="function">siftDown</span>(arr, n, i);
+  }
+
+  <span class="comment">// 提取元素</span>
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = n - <span class="number">1</span>; i > <span class="number">0</span>; i--) {
+    [arr[<span class="number">0</span>], arr[i]] = [arr[i], arr[<span class="number">0</span>]];
+    <span class="function">siftDown</span>(arr, i, <span class="number">0</span>);
+  }
+
+  <span class="keyword">return</span> arr;
+}
+
+<span class="keyword">function</span> <span class="function">siftDown</span>(arr: number[], n: number, i: number): <span class="keyword">void</span> {
+  <span class="keyword">while</span> (<span class="keyword">true</span>) {
+    <span class="keyword">let</span> largest = i;
+    <span class="keyword">const</span> left = <span class="number">2</span> * i + <span class="number">1</span>;
+    <span class="keyword">const</span> right = <span class="number">2</span> * i + <span class="number">2</span>;
+
+    <span class="keyword">if</span> (left < n && arr[left] > arr[largest]) {
+      largest = left;
+    }
+    <span class="keyword">if</span> (right < n && arr[right] > arr[largest]) {
+      largest = right;
+    }
+
+    <span class="keyword">if</span> (largest === i) <span class="keyword">break</span>;
+
+    [arr[i], arr[largest]] = [arr[largest], arr[i]];
+    i = largest;
+  }
+}
+
+<span class="comment">// 测试</span>
+console.<span class="function">log</span>(<span class="function">heapSort</span>([<span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">6</span>]));
+<span class="comment">// [1, 1, 2, 3, 4, 5, 6, 9]</span></code></pre>
+
+    <hr>
+
+    <h2>五、学习建议</h2>
+
+    <h3>5.1 学习路径</h3>
+    <ol>
+        <li><strong>第一遍通读</strong>：快速浏览，了解整体结构</li>
+        <li><strong>第二遍精读</strong>：跟着书中的例子动手实现</li>
+        <li><strong>第三遍实践</strong>：用学到的思想解决实际问题</li>
+    </ol>
+
+    <h3>5.2 配套练习</h3>
+    <ul>
+        <li>实现书中提到的所有算法</li>
+        <li>分析自己代码的时间/空间复杂度</li>
+        <li>尝试用不同方法解决同一问题</li>
+    </ul>
+
+    <h3>5.3 延伸阅读</h3>
+    <ul>
+        <li>《算法导论》- Thomas H. Cormen</li>
+        <li>《代码整洁之道》- Robert C. Martin</li>
+        <li>《算法》- Robert Sedgewick</li>
+    </ul>
+
+    <hr>
+
+    <h2>六、总结</h2>
+
+    <div class="summary-table">
+        <table>
+            <tbody>
+                <tr>
+                    <th>维度</th>
+                    <th>要点</th>
+                </tr>
+                <tr>
+                    <td>核心理念</td>
+                    <td>思考优先于编码</td>
+                </tr>
+                <tr>
+                    <td>算法重点</td>
+                    <td>二分、排序、哈希、堆</td>
+                </tr>
+                <tr>
+                    <td>性能优化</td>
+                    <td>先找瓶颈，再优化</td>
+                </tr>
+                <tr>
+                    <td>代码质量</td>
+                    <td>简洁、可读、可测试</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>《编程珠玑》不是一本读一遍就扔的书。它值得反复阅读，每次都会有新的收获。</p>
+
+    <hr>
+
+    <h2>参考资料</h2>
+    <ul>
+        <li><a href="https://book.douban.com/subject/3227098/" target="_blank">编程珠玑 (豆瓣)</a></li>
+        <li><a href="https://www.amazon.com/Programming-Pearls-2nd-Edition/dp/0201657880" target="_blank">Programming Pearls (Amazon)</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2024 ES6 Tutorial | <a href="../../index.html">返回首页</a></p>
+    </footer>
+</body>
+</html>
