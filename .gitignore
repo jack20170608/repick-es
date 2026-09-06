@@ -20,6 +20,8 @@ buildNumber.properties
 *.classpath
 *.project
 uploads/
+.remember
+.clinic
 
 # Eclipse
 .classpath
